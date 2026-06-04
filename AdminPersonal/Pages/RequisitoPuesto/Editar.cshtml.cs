@@ -1,4 +1,3 @@
-using AdminPersonal.Entities;
 using AdminPersonal.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -22,12 +21,10 @@ namespace AdminPersonal.Pages.RequisitoPuesto
         public IActionResult OnGet(int id)
         {
             var requisito = _service.ObtenerPorId(id);
-
             if (requisito == null)
             {
                 return NotFound();
             }
-
             Requisito = requisito;
             Puestos = _service.ObtenerPuestos();
             return Page();
@@ -35,6 +32,15 @@ namespace AdminPersonal.Pages.RequisitoPuesto
 
         public IActionResult OnPost()
         {
+            // Validar que se seleccionó un puesto
+            if (Requisito.id_puesto <= 0)
+            {
+                ViewData["Error"] = "Debe seleccionar un puesto.";
+                Puestos = _service.ObtenerPuestos();
+                return Page();
+            }
+
+            // Validar nombre obligatorio
             if (string.IsNullOrWhiteSpace(Requisito.nombre_requisito))
             {
                 ViewData["Error"] = "El nombre del requisito es obligatorio.";
@@ -42,6 +48,7 @@ namespace AdminPersonal.Pages.RequisitoPuesto
                 return Page();
             }
 
+            // Validar duplicado excluyendo el registro actual
             if (_service.BuscarDuplicadoEditar(Requisito.nombre_requisito, Requisito.id_puesto, Requisito.id_requisito) != null)
             {
                 ViewData["Error"] = "Ya existe ese requisito para este puesto.";

@@ -19,36 +19,38 @@ namespace AdminPersonal.Pages.Rol
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var rol = await _rolService.ObtenerPorIdAsync(id);
-
             if (rol == null)
             {
                 return NotFound();
             }
-
             Rol = rol;
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Validar vacío primero
             if (string.IsNullOrWhiteSpace(Rol.nombre_rol))
             {
                 ViewData["Error"] = "El nombre del rol no puede estar vacío.";
                 return Page();
             }
 
+            // Validar longitud
             if (Rol.nombre_rol.Length > 40)
             {
                 ViewData["Error"] = "El nombre del rol no puede superar los 40 caracteres.";
                 return Page();
             }
 
-            if (!System.Text.RegularExpressions.Regex.IsMatch(Rol.nombre_rol, @"^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"))
+            // Validar solo letras y espacios
+            if (!System.Text.RegularExpressions.Regex.IsMatch(Rol.nombre_rol,@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"))
             {
                 ViewData["Error"] = "El nombre del rol solo debe contener letras y espacios.";
                 return Page();
             }
 
+            // Validar duplicado excluyendo el registro actual
             if (await _rolService.NombreExisteAsync(Rol.nombre_rol, Rol.id_rol))
             {
                 ViewData["Error"] = "El nombre del rol ya existe.";

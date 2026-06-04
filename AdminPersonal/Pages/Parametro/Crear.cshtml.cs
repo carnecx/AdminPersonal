@@ -23,24 +23,28 @@ namespace AdminPersonal.Pages.Parametro
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Validar código obligatorio
             if (string.IsNullOrWhiteSpace(Parametro.Codigo))
             {
                 ViewData["Error"] = "El código es obligatorio.";
                 return Page();
             }
 
+            // Validar valor obligatorio
             if (string.IsNullOrWhiteSpace(Parametro.Valor))
             {
                 ViewData["Error"] = "El valor es obligatorio.";
                 return Page();
             }
 
+            // Validar longitud del valor
             if (Parametro.Valor.Length > 500)
             {
                 ViewData["Error"] = "El valor no puede superar los 500 caracteres.";
                 return Page();
             }
 
+            // Validar código duplicado
             if (await _parametroService.CodigoExisteAsync(Parametro.Codigo))
             {
                 ViewData["Error"] = "Ya existe un parámetro con ese código.";
