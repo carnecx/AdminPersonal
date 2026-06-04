@@ -1,0 +1,19 @@
+@page
+@model AdminPersonal.Pages.Instituciones.CrearModel
+
+<h1>Nueva institucion educativa</h1>
+
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Codigo</label>
+        <input asp-for="Datos.codigo" class="form-control" />
+        <span asp-validation-for="Datos.codigo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input asp-for="Datos.nombre" class="form-control" />
+        <span asp-validation-for="Datos.nombre" class="text-danger"></span>
+    </div>
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a class="btn btn-secondary" asp-page="/Instituciones/Index">Volver</a>
+</form>
