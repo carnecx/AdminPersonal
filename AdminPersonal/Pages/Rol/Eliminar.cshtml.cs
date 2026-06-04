@@ -15,9 +15,10 @@ namespace AdminPersonal.Pages.Rol
 
         public async Task<IActionResult> OnPostAsync(int id)
         {
+            // Verificar si el rol está asignado a algún usuario
             if (await _rolService.EstaAsignadoAUsuarioAsync(id))
             {
-                TempData["Error"] = "No se puede eliminar el rol porque está asignado a uno o más usuarios.";
+                TempData["Error"] = "No se puede eliminar un registro con datos relacionados.";
                 return RedirectToPage("Index");
             }
 

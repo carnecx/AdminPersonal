@@ -15,9 +15,10 @@ namespace AdminPersonal.Pages.Pantalla
 
         public IActionResult OnPost(int id)
         {
+            // Verificar si la pantalla está asignada a algún rol
             if (_service.EstaAsignada(id))
             {
-                TempData["Error"] = "No se puede eliminar pantalla ya que esta asignada a uno o mas roles.";
+                TempData["Error"] = "No se puede eliminar un registro con datos relacionados.";
                 return RedirectToPage("Index");
             }
 
