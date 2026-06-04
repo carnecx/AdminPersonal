@@ -4,8 +4,8 @@ using AdminPersonal.Services.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
+
 builder.Services.AddScoped<CompaniaRepository>();
 builder.Services.AddScoped<ICompaniaService, CompaniaService>();
 builder.Services.AddScoped<ParametroRepository>();
@@ -16,11 +16,26 @@ builder.Services.AddScoped<RequisitoPuestoRepository>();
 builder.Services.AddScoped<IRequisitoPuestoService, RequisitoPuestoService>();
 builder.Services.AddScoped<PantallaRepository>();
 builder.Services.AddScoped<IPantallaService, PantallaService>();
+builder.Services.AddScoped<PasswordService>();
+builder.Services.AddScoped<BitacoraRepository>();
+builder.Services.AddScoped<BitacoraService>();
+builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<InstitucionRepository>();
+builder.Services.AddScoped<InstitucionService>();
+builder.Services.AddScoped<UbicacionRepository>();
+builder.Services.AddScoped<UbicacionService>();
 
+// Sesion de 5 minutos
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(5);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -29,11 +44,16 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthorization();
 
-app.MapRazorPages();
+// Redirige la raiz al login
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/Account/Login");
+    return Task.CompletedTask;
+});
 
+app.MapRazorPages();
 app.Run();

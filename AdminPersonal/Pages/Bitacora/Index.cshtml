@@ -1,0 +1,44 @@
+@page
+@model AdminPersonal.Pages.Bitacora.IndexModel
+
+<h1>Bitacoras</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3"><input asp-for="Usuario" class="form-control" placeholder="Filtrar por usuario" /></div>
+    <div class="col-md-4"><input asp-for="Descripcion" class="form-control" placeholder="Buscar en descripcion" /></div>
+    <div class="col-md-3">
+        <select asp-for="Orden" class="form-control">
+            <option value="fecha_desc">Fecha descendente</option>
+            <option value="fecha_asc">Fecha ascendente</option>
+            <option value="usuario_asc">Usuario ascendente</option>
+            <option value="usuario_desc">Usuario descendente</option>
+        </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Filtrar</button></div>
+</form>
+
+<a class="btn btn-secondary mb-3" asp-page="/Home/Bienvenida">Volver</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark"><tr><th>Fecha</th><th>Usuario</th><th>Descripcion</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model.Lista)
+        {
+            <tr><td>@item.fecha</td><td>@item.nombre_usuario</td><td>@item.descripcion</td></tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+        <li class="page-item @(Model.Pagina <= 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="/Bitacora/Index" asp-route-pagina="@(Model.Pagina - 1)"
+               asp-route-usuario="@Model.Usuario" asp-route-descripcion="@Model.Descripcion" asp-route-orden="@Model.Orden">Anterior</a>
+        </li>
+        <li class="page-item disabled"><span class="page-link">Pagina @Model.Pagina de @Model.TotalPaginas</span></li>
+        <li class="page-item @(Model.Pagina >= Model.TotalPaginas ? "disabled" : "")">
+            <a class="page-link" asp-page="/Bitacora/Index" asp-route-pagina="@(Model.Pagina + 1)"
+               asp-route-usuario="@Model.Usuario" asp-route-descripcion="@Model.Descripcion" asp-route-orden="@Model.Orden">Siguiente</a>
+        </li>
+    </ul>
+</nav>

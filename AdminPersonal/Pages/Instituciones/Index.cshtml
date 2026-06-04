@@ -1,0 +1,38 @@
+@page
+@model AdminPersonal.Pages.Instituciones.IndexModel
+
+<h1>Instituciones educativas</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<a class="btn btn-primary mb-3" asp-page="/Instituciones/Crear">Nuevo</a>
+<a class="btn btn-secondary mb-3" asp-page="/Home/Bienvenida">Volver</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr><th>Codigo</th><th>Nombre</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Lista)
+        {
+            <tr>
+                <td>@item.codigo</td>
+                <td>@item.nombre</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" asp-page="/Instituciones/Editar" asp-route-id="@item.id_institucion">Editar</a>
+                    <form method="post" asp-page-handler="Eliminar" asp-route-id="@item.id_institucion" class="d-inline"
+                          onsubmit="return confirm('¿Realmente desea eliminar el elemento seleccionado?');">
+                        <button class="btn btn-danger btn-sm" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

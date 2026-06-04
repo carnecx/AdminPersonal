@@ -1,0 +1,39 @@
+@page
+@model AdminPersonal.Pages.Account.LoginModel
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="logo-text mb-2">SM</div>
+                    <h4>Servicios Medicos SA</h4>
+                    <p class="text-muted">Ingreso al sistema</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Mensaje))
+                {
+                    <div class="alert alert-info">@Model.Mensaje</div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Error))
+                {
+                    <div class="alert alert-danger">@Model.Error</div>
+                }
+
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Usuario</label>
+                        <input asp-for="Datos.NombreUsuario" class="form-control" />
+                        <span asp-validation-for="Datos.NombreUsuario" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contrasena</label>
+                        <input asp-for="Datos.Contrasena" type="password" class="form-control" />
+                        <span asp-validation-for="Datos.Contrasena" class="text-danger"></span>
+                    </div>
+                    <button class="btn btn-primary w-100" type="submit">Aceptar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
