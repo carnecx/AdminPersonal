@@ -4,6 +4,12 @@ using AdminPersonal.Services.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Registro de dependencias para Usuario
+builder.Services.AddScoped<AdminPersonal.Repository.IUsuarioRepository,
+                            AdminPersonal.Repository.UsuarioRepository>();
+builder.Services.AddScoped<AdminPersonal.Services.IUsuarioService,
+                            AdminPersonal.Services.UsuarioService>();
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<CompaniaRepository>();
@@ -16,7 +22,6 @@ builder.Services.AddScoped<RequisitoPuestoRepository>();
 builder.Services.AddScoped<IRequisitoPuestoService, RequisitoPuestoService>();
 builder.Services.AddScoped<PantallaRepository>();
 builder.Services.AddScoped<IPantallaService, PantallaService>();
-
 
 var app = builder.Build();
 
