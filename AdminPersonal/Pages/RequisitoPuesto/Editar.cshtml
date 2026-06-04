@@ -1,0 +1,45 @@
+﻿@page "{id:int}"
+@model AdminPersonal.Pages.RequisitoPuesto.EditarModel
+@{
+    ViewData["Title"] = "Editar Requisito";
+}
+
+<h2>Editar Requisito</h2>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="alert alert-danger">@ViewData["Error"]</div>
+}
+
+<br />
+
+<form method="post">
+    <input type="hidden" name="Requisito.id_requisito" value="@Model.Requisito.id_requisito" />
+
+    <div class="mb-3">
+        <label>Puesto</label>
+        <select name="Requisito.id_puesto" class="form-control" required>
+            <option value="">-- Seleccione un puesto --</option>
+            @foreach (var puesto in Model.Puestos)
+            {
+                if (puesto.id_puesto == Model.Requisito.id_puesto)
+                {
+                    <option value="@puesto.id_puesto" selected>@puesto.nombre</option>
+                }
+                else
+                {
+                    <option value="@puesto.id_puesto">@puesto.nombre</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Nombre del Requisito</label>
+        <input type="text" name="Requisito.nombre_requisito" class="form-control" maxlength="200" value="@Model.Requisito.nombre_requisito" required />
+    </div>
+
+    <br />
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

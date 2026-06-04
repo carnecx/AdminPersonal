@@ -1,0 +1,25 @@
+﻿@page
+@model AdminPersonal.Pages.Pantalla.CrearModel
+@{
+    ViewData["Title"] = "Nueva Pantalla";
+}
+
+<h2>Nueva Pantalla</h2>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="alert alert-danger">@ViewData["Error"]</div>
+}
+
+<br />
+
+<form method="post">
+    <div class="mb-3">
+        <label>Nombre de la Pantalla</label>
+        <input type="text" name="Pantalla.nombre_pantalla" class="form-control" maxlength="100" value="@Model.Pantalla.nombre_pantalla" required />
+    </div>
+
+    <br />
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

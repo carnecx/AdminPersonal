@@ -1,0 +1,27 @@
+﻿@page "{id:int}"
+@model AdminPersonal.Pages.Rol.EditarModel
+@{
+    ViewData["Title"] = "Editar Rol";
+}
+
+<h2>Editar Rol</h2>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="alert alert-danger">@ViewData["Error"]</div>
+}
+
+<br />
+
+<form method="post">
+    <input type="hidden" name="Rol.id_rol" value="@Model.Rol.id_rol" />
+
+    <div class="mb-3">
+        <label>Nombre del rol</label>
+        <input type="text" name="Rol.nombre_rol" class="form-control" maxlength="40" value="@Model.Rol.nombre_rol" required />
+    </div>
+
+    <br />
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

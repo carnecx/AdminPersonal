@@ -1,0 +1,47 @@
+﻿@page
+@model AdminPersonal.Pages.Parametro.IndexModel
+@{
+    ViewData["Title"] = "Parámetros del Sistema";
+}
+
+<h2>Parámetros del Sistema</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<br />
+<a asp-page="Crear" class="btn btn-primary">Nuevo Parámetro</a>
+<br />
+<br />
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Código</th>
+            <th>Valor</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Parametros)
+        {
+            <tr>
+                <td>@item.Codigo</td>
+                <td>@item.Valor</td>
+                <td>
+                    <a asp-page="Editar" asp-route-id="@item.id_parametro" class="btn btn-warning btn-sm">Editar</a>
+                    <form asp-page="Eliminar" asp-route-id="@item.id_parametro" method="post" class="d-inline"
+                          onsubmit="return confirm('¿Realmente desea eliminar el elemento seleccionado?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

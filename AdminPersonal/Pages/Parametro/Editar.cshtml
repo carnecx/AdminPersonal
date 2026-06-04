@@ -1,0 +1,32 @@
+﻿@page "{id:int}"
+@model AdminPersonal.Pages.Parametro.EditarModel
+@{
+    ViewData["Title"] = "Editar Parámetro";
+}
+
+<h2>Editar Parámetro</h2>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="alert alert-danger">@ViewData["Error"]</div>
+}
+
+<br />
+
+<form method="post">
+    <input type="hidden" name="Parametro.id_parametro" value="@Model.Parametro.id_parametro" />
+
+    <div class="mb-3">
+        <label>Código</label>
+        <input type="text" name="Parametro.Codigo" class="form-control" maxlength="100" value="@Model.Parametro.Codigo" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Valor</label>
+        <textarea name="Parametro.Valor" class="form-control" maxlength="500" rows="4">@Model.Parametro.Valor</textarea>
+    </div>
+
+    <br />
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

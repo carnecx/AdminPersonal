@@ -1,0 +1,47 @@
+﻿@page
+@model AdminPersonal.Pages.RequisitoPuesto.IndexModel
+@{
+    ViewData["Title"] = "Requisitos del Puesto";
+}
+
+<h2>Requisitos del Puesto</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<br />
+<a asp-page="Crear" class="btn btn-primary">Nuevo Requisito</a>
+<br />
+<br />
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Puesto</th>
+            <th>Nombre del Requisito</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Requisitos)
+        {
+            <tr>
+                <td>@item.nombre_puesto</td>
+                <td>@item.nombre_requisito</td>
+                <td>
+                    <a asp-page="Editar" asp-route-id="@item.id_requisito" class="btn btn-warning btn-sm">Editar</a>
+                    <form asp-page="Eliminar" asp-route-id="@item.id_requisito" method="post" class="d-inline"
+                          onsubmit="return confirm('¿Realmente desea eliminar el elemento seleccionado?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

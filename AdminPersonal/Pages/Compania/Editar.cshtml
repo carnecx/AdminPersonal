@@ -1,0 +1,32 @@
+﻿@page "{id:int}"
+@model AdminPersonal.Pages.Compania.EditarModel
+@{
+    ViewData["Title"] = "Editar Compañía";
+}
+
+<h2>Editar Compañía</h2>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="alert alert-danger">@ViewData["Error"]</div>
+}
+
+<br />
+
+<form method="post">
+    <input type="hidden" name="Compania.id_compania" value="@Model.Compania.id_compania" />
+
+    <div class="mb-3">
+        <label>Código</label>
+        <input type="text" name="Compania.Codigo" class="form-control" maxlength="100" value="@Model.Compania.Codigo" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input type="text" name="Compania.Nombre" class="form-control" maxlength="150" value="@Model.Compania.Nombre" required />
+    </div>
+
+    <br />
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

@@ -1,0 +1,47 @@
+﻿@page
+@model AdminPersonal.Pages.Rol.IndexModel
+@{
+    ViewData["Title"] = "Roles del sistema";
+}
+
+<h2>Roles del sistema</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<br />
+<a asp-page="Crear" class="btn btn-primary">Nuevo Rol</a>
+<br />
+<br />
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nombre del Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Roles)
+        {
+            <tr>
+                <td>@item.id_rol</td>
+                <td>@item.nombre_rol</td>
+                <td>
+                    <a asp-page="Editar" asp-route-id="@item.id_rol" class="btn btn-warning btn-sm">Editar</a>
+                    <form asp-page="Eliminar" asp-route-id="@item.id_rol" method="post" class="d-inline"
+                          onsubmit="return confirm('¿Estás seguro de eliminar este rol?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

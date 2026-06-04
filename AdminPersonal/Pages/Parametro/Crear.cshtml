@@ -1,0 +1,30 @@
+﻿@page
+@model AdminPersonal.Pages.Parametro.CrearModel
+@{
+    ViewData["Title"] = "Nuevo Parámetro";
+}
+
+<h2>Nuevo Parámetro</h2>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="alert alert-danger">@ViewData["Error"]</div>
+}
+
+<br />
+
+<form method="post">
+    <div class="mb-3">
+        <label>Código</label>
+        <input type="text" name="Parametro.Codigo" class="form-control" maxlength="100" value="@Model.Parametro.Codigo" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Valor</label>
+        <textarea name="Parametro.Valor" class="form-control" maxlength="500" rows="4">@Model.Parametro.Valor</textarea>
+    </div>
+
+    <br />
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
