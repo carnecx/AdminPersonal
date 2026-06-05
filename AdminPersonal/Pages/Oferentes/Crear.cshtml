@@ -1,0 +1,101 @@
+﻿@page
+@model AdminPersonal.Pages.Oferentes.CrearModel
+@{
+    ViewData["Title"] = "Nuevo Oferente";
+}
+
+<h2>Nuevo Oferente</h2>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label class="form-label">Identificación *</label>
+        <input asp-for="Identificacion" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Tipo de Identificación *</label>
+        <select asp-for="TipoIdentificacion" class="form-control">
+            <option value="">-- Seleccione --</option>
+            <option value="Cédula de identidad">Cédula de identidad</option>
+            <option value="DIMEX">DIMEX</option>
+            <option value="Pasaporte">Pasaporte</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Nombre Completo *</label>
+        <input asp-for="NombreCompleto" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Fecha de Nacimiento *</label>
+        <input asp-for="FechaNacimiento" type="date" class="form-control" />
+    </div>
+
+    <hr />
+    <h5>Correos electrónicos *</h5>
+    <div id="correos-container">
+        <div class="mb-3 d-flex gap-2">
+            <input type="email" name="Correos" id="correo_0" class="form-control" placeholder="correo@ejemplo.com" />
+        </div>
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm mb-3" onclick="agregarCorreo()">+ Agregar correo</button>
+
+    <hr />
+    <h5>Teléfonos de contacto *</h5>
+    <div id="telefonos-container">
+        <div class="mb-3 d-flex gap-2">
+            <input type="text" name="Telefonos" id="telefono_0" class="form-control" placeholder="88888888" />
+        </div>
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm mb-3" onclick="agregarTelefono()">+ Agregar teléfono</button>
+
+    <hr />
+    <h5>Concursos en los que participa *</h5>
+    <div class="mb-3">
+        @foreach (var c in Model.Concursos)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="ConcursosSeleccionados"
+                       value="@c.IdConcurso" id="con_@c.IdConcurso" />
+                <label class="form-check-label" for="con_@c.IdConcurso">
+                    @c.Nombre (@c.Codigo)
+                </label>
+            </div>
+        }
+    </div>
+
+    <hr />
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    <script>
+        let correoCount = 1;
+        let telefonoCount = 1;
+
+        function agregarCorreo() {
+            const container = document.getElementById('correos-container');
+            const div = document.createElement('div');
+            div.className = 'mb-3 d-flex gap-2';
+            div.innerHTML = `<input type="email" name="Correos" class="form-control" placeholder="correo@ejemplo.com" />
+                             <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>`;
+            container.appendChild(div);
+            correoCount++;
+        }
+
+        function agregarTelefono() {
+            const container = document.getElementById('telefonos-container');
+            const div = document.createElement('div');
+            div.className = 'mb-3 d-flex gap-2';
+            div.innerHTML = `<input type="text" name="Telefonos" class="form-control" placeholder="88888888" />
+                             <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>`;
+            container.appendChild(div);
+            telefonoCount++;
+        }
+    </script>
+}

@@ -1,0 +1,45 @@
+﻿@page
+@model AdminPersonal.Pages.Oferentes.IndexModel
+@{
+    ViewData["Title"] = "Oferentes";
+}
+
+<h2>Oferentes</h2>
+
+@if (!string.IsNullOrEmpty(Model.Mensaje))
+{
+    <div class="alert alert-success">@Model.Mensaje</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<a asp-page="Crear" class="btn btn-primary mb-3">Nuevo Oferente</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Identificación</th>
+            <th>Tipo</th>
+            <th>Nombre Completo</th>
+            <th>Fecha Nacimiento</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Oferentes)
+        {
+            <tr>
+                <td>@item.Identificacion</td>
+                <td>@item.TipoIdentificacion</td>
+                <td>@item.NombreCompleto</td>
+                <td>@item.FechaNacimiento.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a asp-page="Editar" asp-route-id="@item.IdOferente" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-page="Eliminar" asp-route-id="@item.IdOferente" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

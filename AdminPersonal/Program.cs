@@ -26,6 +26,9 @@ builder.Services.AddScoped<InstitucionService>();
 builder.Services.AddScoped<UbicacionRepository>();
 builder.Services.AddScoped<UbicacionService>();
 
+builder.Services.AddScoped<OferenteRepository>();
+builder.Services.AddScoped<IOferenteService, OferenteService>();
+
 // Sesion de 5 minutos
 builder.Services.AddSession(options =>
 {

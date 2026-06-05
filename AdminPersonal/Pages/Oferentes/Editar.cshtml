@@ -1,0 +1,101 @@
+﻿@page "{id:int}"
+@model AdminPersonal.Pages.Oferentes.EditarModel
+@{
+    ViewData["Title"] = "Editar Oferente";
+}
+
+<h2>Editar Oferente</h2>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<form method="post">
+    <input type="hidden" asp-for="IdOferente" />
+
+    <div class="mb-3">
+        <label class="form-label">Identificación *</label>
+        <input asp-for="Identificacion" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Tipo de Identificación *</label>
+        <select asp-for="TipoIdentificacion" class="form-control" required>
+            <option value="">-- Seleccione --</option>
+            <option value="Cédula de identidad">Cédula de identidad</option>
+            <option value="DIMEX">DIMEX</option>
+            <option value="Pasaporte">Pasaporte</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Nombre Completo *</label>
+        <input asp-for="NombreCompleto" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Fecha de Nacimiento *</label>
+        <input asp-for="FechaNacimiento" type="date" class="form-control" required />
+    </div>
+
+    <hr />
+    <h5>Correos electrónicos *</h5>
+    <div id="correos-container">
+        @for (int i = 0; i < Model.Correos.Count; i++)
+        {
+            <div class="mb-3 d-flex gap-2">
+                <input type="email" name="Correos" value="@Model.Correos[i]" class="form-control" required />
+                @if (i > 0)
+                {
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>
+                }
+            </div>
+        }
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm mb-3" onclick="agregarCampo('correos-container','Correos','email','correo@ejemplo.com')">+ Agregar correo</button>
+
+    <hr />
+    <h5>Teléfonos de contacto *</h5>
+    <div id="telefonos-container">
+        @for (int i = 0; i < Model.Telefonos.Count; i++)
+        {
+            <div class="mb-3 d-flex gap-2">
+                <input type="text" name="Telefonos" value="@Model.Telefonos[i]" class="form-control" required />
+                @if (i > 0)
+                {
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>
+                }
+            </div>
+        }
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm mb-3" onclick="agregarCampo('telefonos-container','Telefonos','text','88888888')">+ Agregar teléfono</button>
+
+    <hr />
+    <h5>Concursos en los que participa *</h5>
+    <div class="mb-3">
+        @foreach (var c in Model.Concursos)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="ConcursosSeleccionados"
+                       value="@c.IdConcurso" id="con_@c.IdConcurso"
+                       @(Model.ConcursosSeleccionados.Contains(c.IdConcurso) ? "checked" : "") />
+                <label class="form-check-label" for="con_@c.IdConcurso">@c.Nombre (@c.Codigo)</label>
+            </div>
+        }
+    </div>
+
+    <hr />
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    <script>
+        function agregarCampo(containerId, name, type, placeholder) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'mb-3 d-flex gap-2';
+            div.innerHTML = `<input type="${type}" name="${name}" class="form-control" placeholder="${placeholder}" required />
+                             <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>`;
+            container.appendChild(div);
+        }
+    </script>
+}

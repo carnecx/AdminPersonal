@@ -1,0 +1,34 @@
+﻿@page "{id:int}"
+@model AdminPersonal.Pages.Oferentes.EliminarModel
+@{
+    ViewData["Title"] = "Eliminar Oferente";
+}
+
+<h2>Eliminar Oferente</h2>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.Oferente != null && string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">
+        ¿Está seguro que desea eliminar al oferente <strong>@Model.Oferente.NombreCompleto</strong>
+        con identificación <strong>@Model.Oferente.Identificacion</strong>?
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="IdOferente" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-page="Index" class="btn btn-secondary">Volver</a>
+    </form>
+}
+else if (string.IsNullOrEmpty(Model.Error))
+{
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+}
+else
+{
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+}
