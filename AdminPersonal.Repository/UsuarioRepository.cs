@@ -50,5 +50,14 @@ namespace AdminPersonal.Repository
                   INNER JOIN usuario_rol ur ON ur.id_rol = r.id_rol
                   WHERE ur.id_usuario = @idUsuario", new { idUsuario });
         }
+
+        public async Task<int?> ObtenerIdRolAsync(int idUsuario)
+        {
+            using var conexion = AbrirConexion();
+            return await conexion.QueryFirstOrDefaultAsync<int?>(
+                @"SELECT ur.id_rol
+                  FROM usuario_rol ur
+                  WHERE ur.id_usuario = @idUsuario", new { idUsuario });
+        }
     }
 }

@@ -31,13 +31,13 @@ namespace AdminPersonal.Repository
         public Pantalla? BuscarDuplicado(string nombre_pantalla)
         {
             using var conexion = AbrirConexion();
-            return conexion.QueryFirstOrDefault<Pantalla>("SELECT id_pantalla FROM pantalla WHERE nombre_pantalla = @nombre_pantalla",new { nombre_pantalla });
+            return conexion.QueryFirstOrDefault<Pantalla>("SELECT id_pantalla, nombre_pantalla FROM pantalla WHERE nombre_pantalla = @nombre_pantalla",new { nombre_pantalla });
         }
 
         public Pantalla? BuscarDuplicadoEditar(string nombre_pantalla, int id_pantalla)
         {
             using var conexion = AbrirConexion();
-            return conexion.QueryFirstOrDefault<Pantalla>("SELECT id_pantalla FROM pantalla WHERE nombre_pantalla = @nombre_pantalla AND id_pantalla != @id_pantalla",new { nombre_pantalla, id_pantalla });
+            return conexion.QueryFirstOrDefault<Pantalla>("SELECT id_pantalla, nombre_pantalla FROM pantalla WHERE nombre_pantalla = @nombre_pantalla AND id_pantalla != @id_pantalla",new { nombre_pantalla, id_pantalla });
         }
 
         public bool EstaAsignada(int id)
@@ -46,10 +46,10 @@ namespace AdminPersonal.Repository
             return conexion.QueryFirstOrDefault<dynamic>("SELECT id_pantalla FROM rol_pantalla WHERE id_pantalla = @Id",new { Id = id }) != null;
         }
 
-        public void Crear(Pantalla pantalla)
+        public int Crear(Pantalla pantalla)
         {
             using var conexion = AbrirConexion();
-            conexion.Execute("INSERT INTO pantalla (nombre_pantalla) VALUES (@nombre_pantalla)",pantalla);
+            return conexion.ExecuteScalar<int>("INSERT INTO pantalla (nombre_pantalla) VALUES (@nombre_pantalla); SELECT LAST_INSERT_ID();",pantalla);
         }
 
         public void Actualizar(Pantalla pantalla)
@@ -62,6 +62,42 @@ namespace AdminPersonal.Repository
         {
             using var conexion = AbrirConexion();
             conexion.Execute("DELETE FROM pantalla WHERE id_pantalla = @Id", new { Id = id });
+        }
+
+        public IEnumerable<RolPantalla> ObtenerRolesConAsignacion(int id_pantalla)
+        {
+            using var conexion = AbrirConexion();
+            return conexion.Query<RolPantalla>(@"SELECT r.id_rol, r.nombre_rol,
+                       CASE WHEN rp.id_pantalla IS NOT NULL THEN 1 ELSE 0 END AS Seleccionado
+                FROM rol r
+                LEFT JOIN rol_pantalla rp ON r.id_rol = rp.id_rol AND rp.id_pantalla = @id_pantalla",
+                new { id_pantalla }).ToList();
+        }
+
+        public void EliminarAsignaciones(int id_pantalla)
+        {
+            using var conexion = AbrirConexion();
+            conexion.Execute("DELETE FROM rol_pantalla WHERE id_pantalla = @id_pantalla",new { id_pantalla });
+        }
+
+        public void AsignarRoles(int id_pantalla, List<int> rolesSeleccionados)
+        {
+            using var conexion = AbrirConexion();
+            foreach (var id_rol in rolesSeleccionados)
+            {
+                conexion.Execute("INSERT INTO rol_pantalla (id_rol, id_pantalla) VALUES (@id_rol, @id_pantalla)",new { id_rol, id_pantalla });
+            }
+        }
+
+        public IEnumerable<string> ObtenerNombresPorRol(int id_rol)
+        {
+            using var conexion = AbrirConexion();
+            return conexion.Query<string>(@"
+                SELECT p.nombre_pantalla
+                FROM pantalla p
+                INNER JOIN rol_pantalla rp ON p.id_pantalla = rp.id_pantalla
+                WHERE rp.id_rol = @id_rol",
+                new { id_rol }).ToList();
         }
     }
 }
