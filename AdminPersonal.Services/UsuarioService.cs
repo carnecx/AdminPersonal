@@ -40,5 +40,11 @@ namespace AdminPersonal.Services
         {
             return await _repositorio.ObtenerRolAsync(idUsuario);
         }
+
+        // NUEVO
+        public async Task<int?> ObtenerIdRolAsync(int idUsuario)
+        {
+            return await _repositorio.ObtenerIdRolAsync(idUsuario);
+        }
     }
 }

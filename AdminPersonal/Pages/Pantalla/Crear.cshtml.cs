@@ -1,55 +1,73 @@
+using AdminPersonal.Entities;
 using AdminPersonal.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace AdminPersonal.Pages.Pantalla
 {
     public class CrearModel : PageModel
     {
         private readonly IPantallaService _service;
-
         public CrearModel(IPantallaService service)
         {
             _service = service;
         }
-
         [BindProperty]
         public AdminPersonal.Entities.Pantalla Pantalla { get; set; } = new();
+        public IEnumerable<RolPantalla> Roles { get; set; } = new List<RolPantalla>();
+        [BindProperty]
+        public List<int> RolesSeleccionados { get; set; } = new();
 
-        public IActionResult OnGet() => Page();
+        public IActionResult OnGet()
+        {
+            var pantallasStr = HttpContext.Session.GetString("PantallasRol") ?? "";
+            var pantallas = pantallasStr.Split('|', StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim().ToLower()).ToHashSet();
+            if (!pantallas.Contains("pantallas"))
+            {
+                TempData["Error"] = "No tiene permisos para acceder a esta secciÛn.";
+                return RedirectToPage("/Home/Bienvenida");
+            }
+            Roles = _service.ObtenerRolesConAsignacion(0);
+            return Page();
+        }
 
         public IActionResult OnPost()
         {
-            // Validar vacÌo
+            var pantallasStr = HttpContext.Session.GetString("PantallasRol") ?? "";
+            var pantallas = pantallasStr.Split('|', StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim().ToLower()).ToHashSet();
+            if (!pantallas.Contains("pantallas"))
+            {
+                TempData["Error"] = "No tiene permisos para acceder a esta secciÛn.";
+                return RedirectToPage("/Home/Bienvenida");
+            }
             if (string.IsNullOrWhiteSpace(Pantalla.nombre_pantalla))
             {
                 ViewData["Error"] = "El nombre de la pantalla es obligatorio.";
+                Roles = _service.ObtenerRolesConAsignacion(0);
                 return Page();
             }
-
-            // Validar longitud
             if (Pantalla.nombre_pantalla.Length > 100)
             {
                 ViewData["Error"] = "El nombre de la pantalla no puede superar los 100 caracteres.";
+                Roles = _service.ObtenerRolesConAsignacion(0);
                 return Page();
             }
-
-            // Validar solo letras y espacios
-            if (!System.Text.RegularExpressions.Regex.IsMatch(Pantalla.nombre_pantalla,
-                @"^[a-zA-Z·ÈÌÛ˙¡…Õ”⁄Ò— ]+$"))
+            if (!System.Text.RegularExpressions.Regex.IsMatch(Pantalla.nombre_pantalla, @"^[a-zA-Z ]+$"))
             {
                 ViewData["Error"] = "El nombre de la pantalla solo debe contener letras y espacios.";
+                Roles = _service.ObtenerRolesConAsignacion(0);
                 return Page();
             }
-
-            // Validar duplicado
             if (_service.BuscarDuplicado(Pantalla.nombre_pantalla) != null)
             {
                 ViewData["Error"] = "Ya existe una pantalla con ese nombre.";
+                Roles = _service.ObtenerRolesConAsignacion(0);
                 return Page();
             }
-
-            _service.Crear(Pantalla);
+            int nuevaId = _service.Crear(Pantalla);
+            if (RolesSeleccionados.Any())
+            {
+                _service.AsignarRoles(nuevaId, RolesSeleccionados);
+            }
             TempData["Mensaje"] = "Pantalla creada exitosamente.";
             return RedirectToPage("Index");
         }

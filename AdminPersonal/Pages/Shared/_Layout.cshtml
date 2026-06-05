@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" asp-page="/Home/Bienvenida">
@@ -34,22 +33,76 @@
         <div class="row min-vh-100">
             @if (Context.Session.GetInt32("IdUsuario") != null)
             {
-                var rolUsuario = Context.Session.GetString("RolUsuario");
+                var pantallasStr = Context.Session.GetString("PantallasRol") ?? "";
+                var pantallas = pantallasStr
+                .Split('|', StringSplitOptions.RemoveEmptyEntries)
+                .Select(p => p.Trim().ToLower())
+                .ToHashSet();
+
                 <aside class="col-md-2 bg-light border-end p-3">
                     <h6 class="text-uppercase text-muted fw-bold mb-3">Menu</h6>
-                    <a class="d-block mb-2 text-decoration-none" asp-page="/Home/Bienvenida"><i class="bi bi-house-door me-2"></i>Bienvenida</a>
-                    <a class="d-block mb-2 text-decoration-none" asp-page="/Compania/Index"><i class="bi bi-building me-2"></i>Compania</a>
-                    <a class="d-block mb-2 text-decoration-none" asp-page="/Parametro/Index"><i class="bi bi-sliders me-2"></i>Parametros</a>
-                    <a class="d-block mb-2 text-decoration-none" asp-page="/Rol/Index"><i class="bi bi-person-badge me-2"></i>Roles</a>
-                    <a class="d-block mb-2 text-decoration-none" asp-page="/Pantalla/Index"><i class="bi bi-display me-2"></i>Pantallas</a>
-                    <a class="d-block mb-2 text-decoration-none" asp-page="/RequisitoPuesto/Index"><i class="bi bi-clipboard-check me-2"></i>Requisitos de Puesto</a>
-                    <a class="d-block mb-2 text-decoration-none" asp-page="/Instituciones/Index"><i class="bi bi-mortarboard me-2"></i>Instituciones</a>
-                    @if (rolUsuario == "Administrador")
+
+                    <a class="d-block mb-2 text-decoration-none" asp-page="/Home/Bienvenida">
+                        <i class="bi bi-house-door me-2"></i>Bienvenida
+                    </a>
+
+                    @if (pantallas.Contains("compania"))
                     {
-                        <a class="d-block mb-2 text-decoration-none" asp-page="/Ubicaciones/Cargar"><i class="bi bi-upload me-2"></i>Cargar ubicaciones</a>
-                        <a class="d-block mb-2 text-decoration-none" asp-page="/Bitacora/Index"><i class="bi bi-journal-text me-2"></i>Bitacora</a>
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Compania/Index">
+                            <i class="bi bi-building me-2"></i>Compania
+                        </a>
+                    }
+
+                    @if (pantallas.Contains("parametros"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Parametro/Index">
+                            <i class="bi bi-sliders me-2"></i>Parametros
+                        </a>
+                    }
+
+                    @if (pantallas.Contains("roles"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Rol/Index">
+                            <i class="bi bi-person-badge me-2"></i>Roles
+                        </a>
+                    }
+
+                    @if (pantallas.Contains("pantallas"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Pantalla/Index">
+                            <i class="bi bi-display me-2"></i>Pantallas
+                        </a>
+                    }
+
+                    @if (pantallas.Contains("requisitos de puesto"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/RequisitoPuesto/Index">
+                            <i class="bi bi-clipboard-check me-2"></i>Requisitos de Puesto
+                        </a>
+                    }
+
+                    @if (pantallas.Contains("instituciones"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Instituciones/Index">
+                            <i class="bi bi-mortarboard me-2"></i>Instituciones
+                        </a>
+                    }
+
+                    @if (pantallas.Contains("cargar ubicaciones"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Ubicaciones/Cargar">
+                            <i class="bi bi-upload me-2"></i>Cargar ubicaciones
+                        </a>
+                    }
+
+                    @if (pantallas.Contains("bitacora"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Bitacora/Index">
+                            <i class="bi bi-journal-text me-2"></i>Bitacora
+                        </a>
                     }
                 </aside>
+
                 <main class="col-md-10 p-4">@RenderBody()</main>
             }
             else
@@ -66,7 +119,6 @@
     {
         <script>
             let tiempoSesion = 5 * 60 * 1000;
-
             setTimeout(function () {
                 window.location.href = '/Account/Logout?mensaje=La sesion ha expirado.';
             }, tiempoSesion);
