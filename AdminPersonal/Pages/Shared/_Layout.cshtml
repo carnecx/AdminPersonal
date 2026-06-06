@@ -67,6 +67,13 @@
                         </a>
                     }
 
+                    @if (pantallas.Contains("usuarios"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Usuarios/Index">
+                            <i class="bi bi-person-gear me-2"></i>Usuarios
+                        </a>
+                    }
+
                     @if (pantallas.Contains("pantallas"))
                     {
                         <a class="d-block mb-2 text-decoration-none" asp-page="/Pantalla/Index">
