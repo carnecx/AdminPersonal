@@ -102,6 +102,21 @@
                         </a>
                     }
 
+                    @* Nuevos elementos agregados antes de Bitácora *@
+                    @if (pantallas.Contains("oferentes"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Oferentes/Index">
+                            <i class="bi bi-person-lines-fill me-2"></i>Oferentes
+                        </a>
+                    }
+
+                    @if (pantallas.Contains("concursos"))
+                    {
+                        <a class="d-block mb-2 text-decoration-none" asp-page="/Concursos/Index">
+                            <i class="bi bi-trophy me-2"></i>Concursos
+                        </a>
+                    }
+
                     @if (pantallas.Contains("bitacora"))
                     {
                         <a class="d-block mb-2 text-decoration-none" asp-page="/Bitacora/Index">
