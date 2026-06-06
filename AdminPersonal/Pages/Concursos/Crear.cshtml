@@ -1,0 +1,34 @@
+﻿@page
+@model AdminPersonal.Pages.Concursos.CrearModel
+@{
+    ViewData["Title"] = "Nuevo Concurso";
+}
+
+<h2>Nuevo Concurso</h2>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="alert alert-danger">@ViewData["Error"]</div>
+}
+
+<form method="post">
+    <div class="mb-3">
+        <label>Código</label>
+        <input type="text" name="Concurso.Codigo" class="form-control" maxlength="50" required />
+    </div>
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input type="text" name="Concurso.Nombre" class="form-control" maxlength="150" required />
+    </div>
+    <div class="mb-3">
+        <label>Fecha de Inicio</label>
+        <input type="date" name="Concurso.FechaInicio" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label>Fecha de Fin</label>
+        <input type="date" name="Concurso.FechaFin" class="form-control" required />
+    </div>
+    <br />
+    <a asp-page="Index" class="btn btn-secondary">Volver</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

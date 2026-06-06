@@ -1,0 +1,64 @@
+﻿@page
+@model AdminPersonal.Pages.Concursos.IndexModel
+@{
+    ViewData["Title"] = "Concursos";
+}
+
+<h2>Lista de Concursos</h2>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<br />
+<a asp-page="Crear" class="btn btn-primary">Nuevo Concurso</a>
+<br />
+<br />
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Concursos)
+        {
+            <tr>
+                <td>@item.Codigo</td>
+                <td>@item.Nombre</td>
+                <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
+                <td>@item.FechaFin.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <span class="badge @(item.Estado == "Vigente" ? "bg-success" : "bg-secondary")">
+                        @item.Estado
+                    </span>
+                </td>
+                <td>
+                    <a asp-page="Editar" asp-route-id="@item.id_concurso" class="btn btn-warning btn-sm">Editar</a>
+
+                    <form asp-page="CambiarEstado" asp-route-id="@item.id_concurso" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-secondary btn-sm">
+                            @(item.Estado == "Vigente" ? "Marcar Vencido" : "Marcar Vigente")
+                        </button>
+                    </form>
+
+                    <form asp-page="Eliminar" asp-route-id="@item.id_concurso" method="post" class="d-inline"
+                          onsubmit="return confirm('¿Realmente desea eliminar el elemento seleccionado?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
