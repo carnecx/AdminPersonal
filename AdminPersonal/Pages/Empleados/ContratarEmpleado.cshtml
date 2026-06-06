@@ -1,0 +1,51 @@
+﻿@page
+@model AdminPersonal.Pages.Empleados.ContratarEmpleadoModel
+@{
+    ViewData["Title"] = "Contratar Empleado";
+}
+
+<div class="container mt-4">
+    <h2>Contratar Empleado</h2>
+    <hr />
+
+    @if (!string.IsNullOrEmpty(Model.MensajeExito))
+    {
+        <div class="alert alert-success" role="alert">
+            @Model.MensajeExito
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.MensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @Model.MensajeError
+        </div>
+    }
+
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Oferente</label>
+            <select name="IdOferenteSeleccionado" class="form-control" required>
+                <option value="0">-- Seleccione un oferente --</option>
+                @foreach (var o in Model.Oferentes)
+                {
+                    <option value="@o.id_oferente">@o.NombreCompleto — @o.Identificacion</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Puesto</label>
+            <select name="IdPuestoSeleccionado" class="form-control" required>
+                <option value="0">-- Seleccione un puesto --</option>
+                @foreach (var p in Model.Puestos)
+                {
+                    <option value="@p.IdPuesto">@p.Codigo — @p.Nombre (₡@p.Salario.ToString("N2"))</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/" class="btn btn-secondary">Volver</a>
+    </form>
+</div>

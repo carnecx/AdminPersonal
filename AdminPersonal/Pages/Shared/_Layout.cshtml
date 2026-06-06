@@ -102,7 +102,7 @@
                         </a>
                     }
 
-                    @* Nuevos elementos agregados antes de Bitácora *@
+                    @*  *@
                     @if (pantallas.Contains("oferentes"))
                     {
                         <a class="d-block mb-2 text-decoration-none" asp-page="/Oferentes/Index">
@@ -116,6 +116,11 @@
                             <i class="bi bi-trophy me-2"></i>Concursos
                         </a>
                     }
+
+                    @* *@
+                    <a class="d-block mb-2 text-decoration-none" asp-page="/Empleados/ContratarEmpleado">
+                        <i class="bi bi-person-plus me-2"></i>Contratar empleado
+                    </a>
 
                     @if (pantallas.Contains("bitacora"))
                     {
