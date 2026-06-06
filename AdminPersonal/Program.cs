@@ -5,7 +5,6 @@ using AdminPersonal.Services.Abstract;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
-
 builder.Services.AddScoped<CompaniaRepository>();
 builder.Services.AddScoped<ICompaniaService, CompaniaService>();
 builder.Services.AddScoped<ParametroRepository>();
@@ -21,6 +20,8 @@ builder.Services.AddScoped<BitacoraRepository>();
 builder.Services.AddScoped<BitacoraService>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<InstitucionRepository>();
 builder.Services.AddScoped<InstitucionService>();
 builder.Services.AddScoped<UbicacionRepository>();
@@ -48,7 +49,6 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
-// Redirige la raiz al login
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Account/Login");

@@ -1,0 +1,84 @@
+﻿@page
+@model AdminPersonal.Pages.Usuarios.IndexModel
+@{
+    ViewData["Title"] = "Administración de Usuarios";
+}
+
+<h2 class="mb-3">Administración de Usuarios</h2>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success">@TempData["Exito"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<a asp-page="Crear" class="btn btn-primary mb-3">+ Nuevo Usuario</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Nombre de usuario</th>
+            <th>Nombre completo</th>
+            <th>Correo</th>
+            <th>Roles</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model.Usuarios)
+        {
+            <tr>
+                <td>@u.IdUsuario</td>
+                <td>@u.NombreUsuario</td>
+                <td>@u.NombreCompleto</td>
+                <td>@u.Correo</td>
+                <td>@u.RolesNombres</td>
+                <td>
+                    @if (u.Estado == "Activo")
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else if (u.Estado == "Inactivo")
+                    {
+                        <span class="badge bg-secondary">Inactivo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Bloqueado</span>
+                    }
+                </td>
+                <td>
+                    <a asp-page="Editar" asp-route-id="@u.IdUsuario"
+                       class="btn btn-warning btn-sm">Editar</a>
+
+                    <form method="post" asp-page-handler="CambiarEstado" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@u.IdUsuario" />
+                        @if (u.Estado == "Activo")
+                        {
+                            <input type="hidden" name="nuevoEstado" value="Inactivo" />
+                            <button type="submit" class="btn btn-secondary btn-sm">Inactivar</button>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="nuevoEstado" value="Activo" />
+                            <button type="submit" class="btn btn-primary btn-sm">Activar</button>
+                        }
+                    </form>
+
+                    <form method="post" asp-page-handler="Eliminar" class="d-inline"
+                          onsubmit="return confirm('¿Está seguro de eliminar este usuario?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@u.IdUsuario" />
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
