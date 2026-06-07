@@ -1,38 +1,94 @@
 @page
+
 @model AdminPersonal.Pages.Instituciones.IndexModel
 
+<!-- titulo de la pantalla -->
 <h1>Instituciones educativas</h1>
 
+<!-- muestra mensaje de exito cuando una operacion se realiza correctamente -->
 @if (TempData["Mensaje"] != null)
 {
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
+    <div class="alert alert-success">
+        @TempData["Mensaje"]
+    </div>
 }
+
+<!-- muestra mensaje de error cuando ocurre un problema -->
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
 }
 
-<a class="btn btn-primary mb-3" asp-page="/Instituciones/Crear">Nuevo</a>
-<a class="btn btn-secondary mb-3" asp-page="/Home/Bienvenida">Volver</a>
+<!-- boton para crear una nueva institucion -->
+<a class="btn btn-primary mb-3"
+   asp-page="/Instituciones/Crear">
+    Nuevo
+</a>
 
+<!-- boton para regresar a la pantalla de bienvenida -->
+<a class="btn btn-secondary mb-3"
+   asp-page="/Home/Bienvenida">
+    Volver
+</a>
+
+<!-- tabla que muestra las instituciones registradas -->
 <table class="table table-bordered table-striped">
+
+    <!-- encabezado de la tabla -->
     <thead class="table-dark">
-        <tr><th>Codigo</th><th>Nombre</th><th>Acciones</th></tr>
+        <tr>
+            <th>Codigo</th>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
     </thead>
+
+    <!-- cuerpo de la tabla -->
     <tbody>
+
+        <!-- recorre la lista de instituciones -->
         @foreach (var item in Model.Lista)
         {
             <tr>
+
+                <!-- codigo de la institucion -->
                 <td>@item.codigo</td>
+
+                <!-- nombre de la institucion -->
                 <td>@item.nombre</td>
+
+                <!-- botones de acciones -->
                 <td>
-                    <a class="btn btn-warning btn-sm" asp-page="/Instituciones/Editar" asp-route-id="@item.id_institucion">Editar</a>
-                    <form method="post" asp-page-handler="Eliminar" asp-route-id="@item.id_institucion" class="d-inline"
+
+                    <!-- boton para editar la institucion -->
+                    <a class="btn btn-warning btn-sm"
+                       asp-page="/Instituciones/Editar"
+                       asp-route-id="@item.id_institucion">
+                        Editar
+                    </a>
+
+                    <!-- formulario para eliminar la institucion -->
+                    <form method="post"
+                          asp-page-handler="Eliminar"
+                          asp-route-id="@item.id_institucion"
+                          class="d-inline"
                           onsubmit="return confirm('¿Realmente desea eliminar el elemento seleccionado?');">
-                        <button class="btn btn-danger btn-sm" type="submit">Eliminar</button>
+
+                        <!-- boton eliminar -->
+                        <button class="btn btn-danger btn-sm"
+                                type="submit">
+                            Eliminar
+                        </button>
+
                     </form>
+
                 </td>
+
             </tr>
         }
+
     </tbody>
+
 </table>

@@ -1,23 +1,45 @@
 @page
+
 @model AdminPersonal.Pages.Ubicaciones.CargarModel
 
+<!-- titulo principal de la pantalla -->
 <h1>Cargar datos de ubicacion</h1>
+
+<!-- indica al usuario el formato esperado del archivo -->
 <p>Formato del archivo CSV: provincia, canton, distrito</p>
 
+<!-- muestra mensaje de exito cuando la carga se realiza correctamente -->
 @if (!string.IsNullOrEmpty(Model.Mensaje))
 {
     <div class="alert alert-success">@Model.Mensaje</div>
 }
+
+<!-- muestra mensaje de error si ocurre algun problema -->
 @if (!string.IsNullOrEmpty(Model.Error))
 {
     <div class="alert alert-danger">@Model.Error</div>
 }
 
+<!-- formulario para subir el archivo csv -->
+<!-- enctype multipart/form-data permite enviar archivos al servidor -->
 <form method="post" enctype="multipart/form-data">
+
+    <!-- campo para seleccionar el archivo -->
     <div class="mb-3">
         <label class="form-label">Archivo CSV</label>
+
+        <!-- enlaza el archivo seleccionado con Datos.Archivo -->
         <input asp-for="Datos.Archivo" type="file" class="form-control" />
     </div>
-    <button class="btn btn-primary" type="submit">Guardar</button>
-    <a class="btn btn-secondary" asp-page="/Home/Bienvenida">Volver</a>
+
+    <!-- boton para procesar y guardar el archivo -->
+    <button class="btn btn-primary" type="submit">
+        Guardar
+    </button>
+
+    <!-- boton para volver a la bienvenida -->
+    <a class="btn btn-secondary" asp-page="/Home/Bienvenida">
+        Volver
+    </a>
+
 </form>

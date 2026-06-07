@@ -1,19 +1,49 @@
 @page
+
 @model AdminPersonal.Pages.Instituciones.CrearModel
 
+<!-- titulo de la pantalla -->
 <h1>Nueva institucion educativa</h1>
 
+<!-- formulario para registrar una nueva institucion -->
 <form method="post">
+
+    <!-- campo codigo -->
     <div class="mb-3">
+
+        <!-- etiqueta del campo -->
         <label class="form-label">Codigo</label>
+
+        <!-- caja de texto enlazada con Datos.codigo -->
         <input asp-for="Datos.codigo" class="form-control" />
+
+        <!-- muestra errores de validacion -->
         <span asp-validation-for="Datos.codigo" class="text-danger"></span>
+
     </div>
+
+    <!-- campo nombre -->
     <div class="mb-3">
+
+        <!-- etiqueta del campo -->
         <label class="form-label">Nombre</label>
+
+        <!-- caja de texto enlazada con Datos.nombre -->
         <input asp-for="Datos.nombre" class="form-control" />
+
+        <!-- muestra errores de validacion -->
         <span asp-validation-for="Datos.nombre" class="text-danger"></span>
+
     </div>
-    <button class="btn btn-primary" type="submit">Guardar</button>
-    <a class="btn btn-secondary" asp-page="/Instituciones/Index">Volver</a>
+
+    <!-- boton para guardar la nueva institucion -->
+    <button class="btn btn-primary" type="submit">
+        Guardar
+    </button>
+
+    <!-- boton para regresar al listado -->
+    <a class="btn btn-secondary" asp-page="/Instituciones/Index">
+        Volver
+    </a>
+
 </form>

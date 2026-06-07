@@ -1,20 +1,53 @@
 @page "{id:int}"
+
 @model AdminPersonal.Pages.Instituciones.EditarModel
 
+<!-- titulo de la pantalla -->
 <h1>Editar institucion educativa</h1>
 
+<!-- formulario para modificar una institucion existente -->
 <form method="post">
+
+    <!-- campo oculto que guarda el id de la institucion -->
+    <!-- permite saber cual registro se esta actualizando -->
     <input type="hidden" asp-for="Datos.id_institucion" />
+
+    <!-- campo codigo -->
     <div class="mb-3">
+
+        <!-- etiqueta del campo -->
         <label class="form-label">Codigo</label>
+
+        <!-- muestra el codigo actual de la institucion -->
         <input asp-for="Datos.codigo" class="form-control" />
+
+        <!-- muestra errores de validacion -->
         <span asp-validation-for="Datos.codigo" class="text-danger"></span>
+
     </div>
+
+    <!-- campo nombre -->
     <div class="mb-3">
+
+        <!-- etiqueta del campo -->
         <label class="form-label">Nombre</label>
+
+        <!-- muestra el nombre actual de la institucion -->
         <input asp-for="Datos.nombre" class="form-control" />
+
+        <!-- muestra errores de validacion -->
         <span asp-validation-for="Datos.nombre" class="text-danger"></span>
+
     </div>
-    <button class="btn btn-primary" type="submit">Guardar</button>
-    <a class="btn btn-secondary" asp-page="/Instituciones/Index">Volver</a>
+
+    <!-- boton para guardar los cambios -->
+    <button class="btn btn-primary" type="submit">
+        Guardar
+    </button>
+
+    <!-- boton para regresar al listado -->
+    <a class="btn btn-secondary" asp-page="/Instituciones/Index">
+        Volver
+    </a>
+
 </form>

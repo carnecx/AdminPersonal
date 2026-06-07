@@ -1,10 +1,20 @@
 @page
+
 @model AdminPersonal.Pages.Home.BienvenidaModel
 
+<!-- tarjeta principal de bienvenida -->
 <div class="card shadow">
+
     <div class="card-body text-center">
+
+        <!-- logo o identificador visual de la empresa -->
         <div class="logo-text mb-3">SM</div>
+
+        <!-- muestra el nombre completo del usuario almacenado en sesion -->
         <h2>Bienvenido, @HttpContext.Session.GetString("NombreCompleto")</h2>
+
+        <!-- descripcion general del sistema -->
         <p class="text-muted">Sistema de Administracion de Personal</p>
+
     </div>
 </div>

@@ -1,37 +1,67 @@
 @page
+
 @model AdminPersonal.Pages.Account.LoginModel
 
 <div class="row justify-content-center mt-5">
     <div class="col-md-4">
         <div class="card shadow">
             <div class="card-body">
+
+                <!-- encabezado de la pantalla de inicio de sesion -->
                 <div class="text-center mb-3">
+
+                    <!-- logo o iniciales de la empresa -->
                     <div class="logo-text mb-2">SM</div>
+
+                    <!-- nombre de la empresa -->
                     <h4>Servicios Medicos SA</h4>
+
+                    <!-- mensaje informativo para el usuario -->
                     <p class="text-muted">Ingreso al sistema</p>
                 </div>
 
+                <!-- muestra mensajes informativos -->
                 @if (!string.IsNullOrEmpty(Model.Mensaje))
                 {
                     <div class="alert alert-info">@Model.Mensaje</div>
                 }
+
+                <!-- muestra mensajes de error -->
                 @if (!string.IsNullOrEmpty(Model.Error))
                 {
                     <div class="alert alert-danger">@Model.Error</div>
                 }
 
+                <!-- formulario de inicio de sesion -->
                 <form method="post">
+
+                    <!-- campo para ingresar el nombre de usuario -->
                     <div class="mb-3">
                         <label class="form-label">Usuario</label>
+
+                        <!-- enlaza el campo con Datos.NombreUsuario -->
                         <input asp-for="Datos.NombreUsuario" class="form-control" />
+
+                        <!-- muestra errores de validacion -->
                         <span asp-validation-for="Datos.NombreUsuario" class="text-danger"></span>
                     </div>
+
+                    <!-- campo para ingresar la contraseña -->
                     <div class="mb-3">
                         <label class="form-label">Contrasena</label>
+
+                        <!-- campo tipo password para ocultar caracteres -->
                         <input asp-for="Datos.Contrasena" type="password" class="form-control" />
+
+                        <!-- muestra errores de validacion -->
                         <span asp-validation-for="Datos.Contrasena" class="text-danger"></span>
                     </div>
-                    <button class="btn btn-primary w-100" type="submit">Aceptar</button>
+
+                    <!-- boton para enviar el formulario -->
+                    <button class="btn btn-primary w-100" type="submit">
+                        Aceptar
+                    </button>
+
                 </form>
             </div>
         </div>
