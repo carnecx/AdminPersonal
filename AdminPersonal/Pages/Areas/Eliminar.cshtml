@@ -1,0 +1,29 @@
+﻿@page
+@model AdminPersonal.Pages.Areas.EliminarModel
+@{
+    ViewData["Title"] = "Eliminar Área";
+}
+
+<h2>Eliminar Área</h2>
+
+@if (!string.IsNullOrEmpty(Model.MensajeError))
+{
+    <div class="alert alert-danger">@Model.MensajeError</div>
+}
+else
+{
+    <p>¿Realmente desea eliminar el elemento seleccionado?</p>
+    <p><strong>Código:</strong> @Model.Codigo</p>
+    <p><strong>Nombre:</strong> @Model.Nombre</p>
+
+    <form method="post">
+        <input type="hidden" name="IdArea" value="@Model.IdArea" />
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a href="/Areas" class="btn btn-secondary">No, volver</a>
+    </form>
+}
+
+@if (!string.IsNullOrEmpty(Model.MensajeError))
+{
+    <a href="/Areas" class="btn btn-secondary mt-2">Volver</a>
+}

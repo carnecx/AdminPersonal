@@ -1,0 +1,44 @@
+﻿@page
+@model AdminPersonal.Pages.Areas.EditarModel
+@{
+    ViewData["Title"] = "Editar Área";
+}
+
+<h2>Editar Área</h2>
+
+@if (!string.IsNullOrEmpty(Model.MensajeError))
+{
+    <div class="alert alert-danger">@Model.MensajeError</div>
+}
+
+<form method="post">
+    <input type="hidden" name="IdArea" value="@Model.IdArea" />
+    <div class="mb-3">
+        <label>Código</label>
+        <input class="form-control" name="Codigo" value="@Model.Codigo" required maxlength="50" />
+    </div>
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input class="form-control" name="Nombre" value="@Model.Nombre" required maxlength="100"
+               pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]+" title="Solo letras y espacios" />
+    </div>
+    <div class="mb-3">
+        <label>Jefatura (Empleado)</label>
+        <select class="form-control" name="IdJefatura" required>
+            <option value="">-- Seleccione --</option>
+            @foreach (var emp in Model.Empleados)
+            {
+                if (emp.IdEmpleado == Model.IdJefatura)
+                {
+                    <option value="@emp.IdEmpleado" selected>@emp.Nombre</option>
+                }
+                else
+                {
+                    <option value="@emp.IdEmpleado">@emp.Nombre</option>
+                }
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/Areas" class="btn btn-secondary">Volver</a>
+</form>

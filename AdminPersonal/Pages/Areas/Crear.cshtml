@@ -1,0 +1,36 @@
+﻿@page
+@model AdminPersonal.Pages.Areas.CrearModel
+@{
+    ViewData["Title"] = "Nueva Área";
+}
+
+<h2>Nueva Área</h2>
+
+@if (!string.IsNullOrEmpty(Model.MensajeError))
+{
+    <div class="alert alert-danger">@Model.MensajeError</div>
+}
+
+<form method="post">
+    <div class="mb-3">
+        <label>Código</label>
+        <input class="form-control" name="Codigo" value="@Model.Codigo" required maxlength="50" />
+    </div>
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input class="form-control" name="Nombre" value="@Model.Nombre" required maxlength="100"
+               pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]+" title="Solo letras y espacios" />
+    </div>
+    <div class="mb-3">
+        <label>Jefatura (Empleado)</label>
+        <select class="form-control" name="IdJefatura" required>
+            <option value="">-- Seleccione --</option>
+            @foreach (var emp in Model.Empleados)
+            {
+                <option value="@emp.IdEmpleado">@emp.Nombre</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/Areas" class="btn btn-secondary">Volver</a>
+</form>
