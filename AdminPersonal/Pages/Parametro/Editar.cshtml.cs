@@ -1,16 +1,20 @@
-﻿using AdminPersonal.Services.Abstract;
+﻿using AdminPersonal.Services;
+using AdminPersonal.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json;
 
 namespace AdminPersonal.Pages.Parametro
 {
     public class EditarModel : PageModel
     {
         private readonly IParametroService _parametroService;
+        private readonly BitacoraService _bitacoraService;
 
-        public EditarModel(IParametroService parametroService)
+        public EditarModel(IParametroService parametroService, BitacoraService bitacoraService)
         {
             _parametroService = parametroService;
+            _bitacoraService = bitacoraService;
         }
 
         [BindProperty]
@@ -29,6 +33,8 @@ namespace AdminPersonal.Pages.Parametro
 
         public async Task<IActionResult> OnPostAsync()
         {
+            var anterior = await _parametroService.ObtenerPorIdAsync(Parametro.id_parametro);
+
             // Validar código obligatorio
             if (string.IsNullOrWhiteSpace(Parametro.Codigo))
             {
@@ -58,6 +64,8 @@ namespace AdminPersonal.Pages.Parametro
             }
 
             await _parametroService.ActualizarAsync(Parametro);
+            var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
+            await _bitacoraService.RegistrarAsync(idUsuario, "Actualización: Anterior=" + JsonSerializer.Serialize(anterior) + " Nuevo=" + JsonSerializer.Serialize(Parametro));
             TempData["Mensaje"] = "Parámetro actualizado exitosamente.";
             return RedirectToPage("Index");
         }

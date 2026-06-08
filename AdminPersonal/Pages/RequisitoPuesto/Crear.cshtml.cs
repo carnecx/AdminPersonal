@@ -1,16 +1,20 @@
+using AdminPersonal.Services;
 using AdminPersonal.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json;
 
 namespace AdminPersonal.Pages.RequisitoPuesto
 {
     public class CrearModel : PageModel
     {
         private readonly IRequisitoPuestoService _service;
+        private readonly BitacoraService _bitacoraService;
 
-        public CrearModel(IRequisitoPuestoService service)
+        public CrearModel(IRequisitoPuestoService service, BitacoraService bitacoraService)
         {
             _service = service;
+            _bitacoraService = bitacoraService;
         }
 
         [BindProperty]
@@ -24,33 +28,29 @@ namespace AdminPersonal.Pages.RequisitoPuesto
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
-            // Validar que se seleccionó un puesto
             if (Requisito.id_puesto <= 0)
             {
                 ViewData["Error"] = "Debe seleccionar un puesto.";
                 Puestos = _service.ObtenerPuestos();
                 return Page();
             }
-
-            // Validar nombre obligatorio
             if (string.IsNullOrWhiteSpace(Requisito.nombre_requisito))
             {
                 ViewData["Error"] = "El nombre del requisito es obligatorio.";
                 Puestos = _service.ObtenerPuestos();
                 return Page();
             }
-
-            // Validar duplicado en el mismo puesto
             if (_service.BuscarDuplicado(Requisito.nombre_requisito, Requisito.id_puesto) != null)
             {
                 ViewData["Error"] = "Ya existe ese requisito para este puesto.";
                 Puestos = _service.ObtenerPuestos();
                 return Page();
             }
-
             _service.Crear(Requisito);
+            var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
+            await _bitacoraService.RegistrarAsync(idUsuario, "Creación: " + JsonSerializer.Serialize(Requisito));
             TempData["Mensaje"] = "Requisito creado exitosamente.";
             return RedirectToPage("Index");
         }
