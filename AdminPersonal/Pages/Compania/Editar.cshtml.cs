@@ -1,16 +1,20 @@
-﻿using AdminPersonal.Services.Abstract;
+﻿using AdminPersonal.Services;
+using AdminPersonal.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json;
 
 namespace AdminPersonal.Pages.Compania
 {
     public class EditarModel : PageModel
     {
         private readonly ICompaniaService _companiaService;
+        private readonly BitacoraService _bitacoraService;
 
-        public EditarModel(ICompaniaService companiaService)
+        public EditarModel(ICompaniaService companiaService, BitacoraService bitacoraService)
         {
             _companiaService = companiaService;
+            _bitacoraService = bitacoraService;
         }
 
         [BindProperty]
@@ -29,6 +33,8 @@ namespace AdminPersonal.Pages.Compania
 
         public async Task<IActionResult> OnPostAsync()
         {
+            var anterior = await _companiaService.ObtenerPorIdAsync(Compania.id_compania);
+
             // Validar código obligatorio
             if (string.IsNullOrWhiteSpace(Compania.Codigo))
             {
@@ -58,6 +64,8 @@ namespace AdminPersonal.Pages.Compania
             }
 
             await _companiaService.ActualizarAsync(Compania);
+            var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
+            await _bitacoraService.RegistrarAsync(idUsuario,"Actualización: Anterior=" + JsonSerializer.Serialize(anterior) + " Nuevo=" + JsonSerializer.Serialize(Compania));
             TempData["Mensaje"] = "Compañía actualizada exitosamente.";
             return RedirectToPage("Index");
         }
