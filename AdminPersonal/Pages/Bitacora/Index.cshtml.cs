@@ -28,7 +28,7 @@ namespace AdminPersonal.Pages.Bitacora
             if (HttpContext.Session.GetInt32("IdUsuario") == null)
                 return RedirectToPage("/Account/Login", new { mensaje = "Por favor inicie sesión para utilizar el sistema" });
 
-            const int tamanoPagina = 100;
+            const int tamanoPagina = 10;
             if (Pagina < 1) Pagina = 1;
 
             int total = await _bitacoraService.ContarAsync(Usuario, Descripcion);
