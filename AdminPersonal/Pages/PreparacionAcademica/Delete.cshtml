@@ -1,0 +1,27 @@
+@page
+@model AdminPersonal.Pages.PreparacionAcademica.DeleteModel
+@{
+    ViewData["Title"] = "Eliminar Preparación Académica";
+}
+
+<div class="container mt-4">
+    <h2>Eliminar Preparación Académica</h2>
+    
+    <div class="alert alert-danger text-center">
+        <h4>¿Realmente desea eliminar el elemento seleccionado?</h4>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>Institución:</strong> @Model.Preparacion.NombreInstitucion</p>
+            <p><strong>Título:</strong> @Model.Preparacion.Titulo</p>
+            <p><strong>Fecha Inicio:</strong> @Model.Preparacion.FechaInicio.ToString("dd/MM/yyyy")</p>
+            <p><strong>Fecha Fin:</strong> @Model.Preparacion.FechaFin.ToString("dd/MM/yyyy")</p>
+        </div>
+    </div>
+
+    <form method="post" class="text-center">
+        <button type="submit" class="btn btn-danger px-4">Si</button>
+        <a asp-page="Index" asp-route-oferenteId="@Model.Preparacion.OferenteId" class="btn btn-secondary px-4">No</a>
+    </form>
+</div>

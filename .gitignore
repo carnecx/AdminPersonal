@@ -427,3 +427,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Local configuration files containing sensitive credentials
+appsettings.Development.json
+appsettings.local.json
+

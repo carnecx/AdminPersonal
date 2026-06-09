@@ -4,6 +4,10 @@ using AdminPersonal.Services.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
+AdminPersonal.Repository.ConnectionProvider.ConnectionString = connectionString;
+AdminPersonal.Repository.BitacoraRepository.Inicializar();
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<CompaniaRepository>();

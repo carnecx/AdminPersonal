@@ -1,0 +1,54 @@
+@page
+@model AdminPersonal.Pages.AccionesPersonal.EditModel
+@{
+    ViewData["Title"] = "Editar Acción de Personal";
+}
+
+<div class="container mt-4">
+    <h2>Editar Acción de Personal</h2>
+    
+    <form method="post">
+        <input type="hidden" asp-for="Accion.Id" />
+        <input type="hidden" asp-for="Accion.Codigo" />
+
+        <div class="mb-3">
+            <label class="form-label">Código</label>
+            <input type="text" class="form-control" asp-for="Accion.Codigo" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Accion.Fecha" class="form-label">Fecha de la Acción *</label>
+            <input asp-for="Accion.Fecha" type="date" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Accion.Descripcion" class="form-label">Descripción * (Máx 500 caracteres)</label>
+            <textarea asp-for="Accion.Descripcion" class="form-control" rows="4" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Accion.EmpleadoId" class="form-label">Empleado *</label>
+            <select asp-for="Accion.EmpleadoId" class="form-control" required>
+                <option value="">Seleccione un empleado</option>
+                @foreach (var emp in Model.EmpleadosList)
+                {
+                    <option value="@emp.Id">@emp.Nombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Accion.JefaturaApruebaId" class="form-label">Jefatura que Aprueba *</label>
+            <select asp-for="Accion.JefaturaApruebaId" class="form-control" required>
+                <option value="">Seleccione una jefatura</option>
+                @foreach (var emp in Model.EmpleadosList)
+                {
+                    <option value="@emp.Id">@emp.Nombre</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

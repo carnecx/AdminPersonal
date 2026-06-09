@@ -1,0 +1,26 @@
+@page
+@model AdminPersonal.Pages.Entrevistas.DeleteModel
+@{
+    ViewData["Title"] = "Eliminar Entrevista";
+}
+
+<div class="container mt-4">
+    <h2>Eliminar Entrevista</h2>
+    
+    <div class="alert alert-danger text-center">
+        <h4>¿Realmente desea eliminar el elemento seleccionado?</h4>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>Oferente:</strong> @Model.Entrevista.NombreOferente</p>
+            <p><strong>Entrevistador:</strong> @Model.Entrevista.NombreEntrevistador</p>
+            <p><strong>Fecha:</strong> @Model.Entrevista.FechaEntrevista.ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+    </div>
+
+    <form method="post" class="text-center">
+        <button type="submit" class="btn btn-danger px-4">Si</button>
+        <a asp-page="Index" class="btn btn-secondary px-4">No</a>
+    </form>
+</div>
