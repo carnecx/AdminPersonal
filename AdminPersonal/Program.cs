@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 // agrega soporte para razor pages
 builder.Services.AddRazorPages();
 
+builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+
 // registra los repositorios y servicios de compania
 builder.Services.AddScoped<CompaniaRepository>();
 builder.Services.AddScoped<ICompaniaService, CompaniaService>();
