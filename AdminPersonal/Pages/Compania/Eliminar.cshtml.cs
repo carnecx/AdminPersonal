@@ -21,10 +21,17 @@ namespace AdminPersonal.Pages.Compania
         public async Task<IActionResult> OnPostAsync(int id)
         {
             var compania = await _companiaService.ObtenerPorIdAsync(id);
+
             await _companiaService.EliminarAsync(id);
+
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
-            await _bitacoraService.RegistrarAsync(idUsuario, "Eliminación: " + JsonSerializer.Serialize(compania));
+
+            await _bitacoraService.RegistrarAsync(
+                idUsuario,
+                "Eliminación: " + JsonSerializer.Serialize(compania));
+
             TempData["Mensaje"] = "Compañía eliminada exitosamente.";
+
             return RedirectToPage("Index");
         }
     }

@@ -6,31 +6,87 @@
 
 <h2>Nuevo Requisito</h2>
 
-@if (ViewData["Error"] != null)
-{
-    <div class="alert alert-danger">@ViewData["Error"]</div>
-}
-
 <br />
 
 <form method="post">
     <div class="mb-3">
         <label>Puesto</label>
-        <select name="Requisito.id_puesto" class="form-control" required>
+
+        <select name="Requisito.id_puesto"
+                class="form-control"
+                required>
+
             <option value="">-- Seleccione un puesto --</option>
+
             @foreach (var puesto in Model.Puestos)
             {
-                <option value="@puesto.id_puesto">@puesto.nombre</option>
+                <option value="@puesto.id_puesto">
+                    @puesto.nombre
+                </option>
             }
         </select>
     </div>
 
     <div class="mb-3">
         <label>Nombre del Requisito</label>
-        <input type="text" name="Requisito.nombre_requisito" class="form-control" maxlength="200" value="@Model.Requisito.nombre_requisito" required />
+
+        <input type="text"
+               name="Requisito.nombre_requisito"
+               class="form-control"
+               maxlength="200"
+               value="@Model.Requisito.nombre_requisito"
+               required />
     </div>
 
     <br />
-    <a asp-page="Index" class="btn btn-secondary">Volver</a>
-    <button type="submit" class="btn btn-primary">Guardar</button>
+
+    <a asp-page="Index"
+       class="btn btn-secondary">
+        Volver
+    </a>
+
+    <button type="submit"
+            class="btn btn-primary">
+        Guardar
+    </button>
 </form>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Error</h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    @ViewData["Error"]
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-primary"
+                            data-bs-dismiss="modal">
+                        Aceptar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new bootstrap.Modal(
+                document.getElementById('errorModal')
+            ).show();
+        });
+    </script>
+}

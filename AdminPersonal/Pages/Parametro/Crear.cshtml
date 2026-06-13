@@ -6,25 +6,76 @@
 
 <h2>Nuevo Parámetro</h2>
 
-@if (ViewData["Error"] != null)
-{
-    <div class="alert alert-danger">@ViewData["Error"]</div>
-}
-
 <br />
 
 <form method="post">
     <div class="mb-3">
         <label>Código</label>
-        <input type="text" name="Parametro.Codigo" class="form-control" maxlength="100" value="@Model.Parametro.Codigo" required />
+        <input type="text"
+               name="Parametro.Codigo"
+               class="form-control"
+               maxlength="100"
+               value="@Model.Parametro.Codigo"
+               required />
     </div>
 
     <div class="mb-3">
         <label>Valor</label>
-        <textarea name="Parametro.Valor" class="form-control" maxlength="500" rows="4">@Model.Parametro.Valor</textarea>
+        <textarea name="Parametro.Valor"
+                  class="form-control"
+                  maxlength="500"
+                  rows="4">@Model.Parametro.Valor</textarea>
     </div>
 
     <br />
-    <a asp-page="Index" class="btn btn-secondary">Volver</a>
-    <button type="submit" class="btn btn-primary">Guardar</button>
+
+    <a asp-page="Index"
+       class="btn btn-secondary">
+        Volver
+    </a>
+
+    <button type="submit"
+            class="btn btn-primary">
+        Guardar
+    </button>
 </form>
+
+@if (ViewData["Error"] != null)
+{
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Error</h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    @ViewData["Error"]
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-primary"
+                            data-bs-dismiss="modal">
+                        Aceptar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new bootstrap.Modal(
+                document.getElementById('errorModal')
+            ).show();
+        });
+    </script>
+}
