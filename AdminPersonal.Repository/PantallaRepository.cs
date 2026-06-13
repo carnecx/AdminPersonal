@@ -89,11 +89,6 @@ namespace AdminPersonal.Repository
             using var conexion = _dbFactory.CrearConexion();
 
             return conexion.Query<string>(@"SELECT p.nombre_pantalla FROM pantalla p
-                INNER JOIN rol_pantalla rp ON p.id_pantalla = rp.id_pantalla
-                WHERE rp.id_rol = @id_rol",
-
-
-            return conexion.Query<string>(@"SELECT p.nombre_pantalla FROM pantalla p
                   INNER JOIN rol_pantalla rp ON p.id_pantalla = rp.id_pantalla
                   WHERE rp.id_rol = @id_rol",
                 new { id_rol }).ToList();
