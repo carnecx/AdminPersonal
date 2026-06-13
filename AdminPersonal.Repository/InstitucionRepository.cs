@@ -33,6 +33,7 @@ namespace AdminPersonal.Repository
             return await conexion.QueryAsync<InstitucionEducativa>(
                 "SELECT * FROM institucion_educativa ORDER BY nombre LIMIT 10");
         }
+        //convierte el query las filas que devuelve en objetos
 
         // busca una institucion por su identificador
         public async Task<InstitucionEducativa?> ObtenerPorIdAsync(int id)
@@ -40,6 +41,7 @@ namespace AdminPersonal.Repository
             using var conexion = AbrirConexion();
 
             // retorna la institucion correspondiente al id recibido
+           
             return await conexion.QueryFirstOrDefaultAsync<InstitucionEducativa>(
                 "SELECT * FROM institucion_educativa WHERE id_institucion = @id",
                 new { id });

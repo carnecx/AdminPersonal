@@ -7,6 +7,7 @@
         <div class="card shadow">
             <div class="card-body">
 
+                ```
                 <!-- encabezado de la pantalla de inicio de sesion -->
                 <div class="text-center mb-3">
 
@@ -18,25 +19,64 @@
 
                     <!-- mensaje informativo para el usuario -->
                     <p class="text-muted">Ingreso al sistema</p>
+
                 </div>
 
-                <!-- muestra mensajes informativos -->
-                @if (!string.IsNullOrEmpty(Model.Mensaje))
+                <!-- muestra mensajes mediante modal -->
+                @if (!string.IsNullOrEmpty(Model.Mensaje) || !string.IsNullOrEmpty(Model.Error))
                 {
-                    <div class="alert alert-info">@Model.Mensaje</div>
-                }
+                    <div class="modal fade show" style="display:block;" tabindex="-1">
 
-                <!-- muestra mensajes de error -->
-                @if (!string.IsNullOrEmpty(Model.Error))
-                {
-                    <div class="alert alert-danger">@Model.Error</div>
-                }
+                        <div class="modal-dialog">
+
+                            <div class="modal-content">
+
+                                <!-- titulo del modal -->
+                                <div class="modal-header">
+
+                                    <h5 class="modal-title">
+                                        @(!string.IsNullOrEmpty(Model.Error) ? "Error" : "Mensaje")
+                                    </h5>
+
+                                </div>
+
+                                <!-- contenido del mensaje -->
+                                <div class="modal-body">
+
+                                    <p>
+                                        @(!string.IsNullOrEmpty(Model.Error)
+                                                                            ? Model.Error
+                                                                            : Model.Mensaje)
+                                </p>
+
+                                </div>
+
+                                <!-- boton para cerrar -->
+                                <div class="modal-footer">
+
+                                    <a class="btn btn-primary"
+                                       asp-page="/Account/Login">
+                                        Aceptar
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- fondo oscuro del modal -->
+                    <div class="modal-backdrop fade show"></div>
+                                }
 
                 <!-- formulario de inicio de sesion -->
                 <form method="post">
 
                     <!-- campo para ingresar el nombre de usuario -->
                     <div class="mb-3">
+
                         <label class="form-label">Usuario</label>
 
                         <!-- enlaza el campo con Datos.NombreUsuario -->
@@ -44,17 +84,22 @@
 
                         <!-- muestra errores de validacion -->
                         <span asp-validation-for="Datos.NombreUsuario" class="text-danger"></span>
+
                     </div>
 
                     <!-- campo para ingresar la contraseña -->
                     <div class="mb-3">
+
                         <label class="form-label">Contrasena</label>
 
                         <!-- campo tipo password para ocultar caracteres -->
-                        <input asp-for="Datos.Contrasena" type="password" class="form-control" />
+                        <input asp-for="Datos.Contrasena"
+                               type="password"
+                               class="form-control" />
 
                         <!-- muestra errores de validacion -->
                         <span asp-validation-for="Datos.Contrasena" class="text-danger"></span>
+
                     </div>
 
                     <!-- boton para enviar el formulario -->
@@ -63,7 +108,10 @@
                     </button>
 
                 </form>
+
             </div>
         </div>
     </div>
+    ```
+
 </div>

@@ -2,44 +2,69 @@
 
 @model AdminPersonal.Pages.Ubicaciones.CargarModel
 
-<!-- titulo principal de la pantalla -->
 <h1>Cargar datos de ubicacion</h1>
 
-<!-- indica al usuario el formato esperado del archivo -->
 <p>Formato del archivo CSV: provincia, canton, distrito</p>
 
-<!-- muestra mensaje de exito cuando la carga se realiza correctamente -->
-@if (!string.IsNullOrEmpty(Model.Mensaje))
+@if (!string.IsNullOrEmpty(Model.Mensaje) || !string.IsNullOrEmpty(Model.Error))
 {
-    <div class="alert alert-success">@Model.Mensaje</div>
+    <div class="modal fade show" style="display:block;" tabindex="-1">
+       
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(!string.IsNullOrEmpty(Model.Error) ? "Error" : "Mensaje")
+                    </h5>
+                </div>
+
+                <div class="modal-body">
+                    <p>
+                        @(!string.IsNullOrEmpty(Model.Error)
+                                            ? Model.Error
+                                            : Model.Mensaje)
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <a class="btn btn-primary"
+                   asp-page="/Ubicaciones/Cargar">
+                    Aceptar
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal-backdrop fade show"></div>
+
+
 }
 
-<!-- muestra mensaje de error si ocurre algun problema -->
-@if (!string.IsNullOrEmpty(Model.Error))
-{
-    <div class="alert alert-danger">@Model.Error</div>
-}
-
-<!-- formulario para subir el archivo csv -->
-<!-- enctype multipart/form-data permite enviar archivos al servidor -->
 <form method="post" enctype="multipart/form-data">
 
-    <!-- campo para seleccionar el archivo -->
+    
     <div class="mb-3">
         <label class="form-label">Archivo CSV</label>
 
-        <!-- enlaza el archivo seleccionado con Datos.Archivo -->
-        <input asp-for="Datos.Archivo" type="file" class="form-control" />
+        <input asp-for="Datos.Archivo"
+               type="file"
+               class="form-control" />
     </div>
 
-    <!-- boton para procesar y guardar el archivo -->
     <button class="btn btn-primary" type="submit">
         Guardar
     </button>
 
-    <!-- boton para volver a la bienvenida -->
-    <a class="btn btn-secondary" asp-page="/Home/Bienvenida">
+    <a class="btn btn-secondary"
+       asp-page="/Home/Bienvenida">
         Volver
     </a>
+
 
 </form>

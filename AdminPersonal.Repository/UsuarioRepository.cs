@@ -114,16 +114,20 @@ namespace AdminPersonal.Repository
         // registra un intento fallido de inicio de sesion
         public async Task RegistrarFalloAsync(Usuario usuario)
         {
-            // abre la conexion a mysql
             using var conn = new MySqlConnection(_connectionString);
 
-            // incrementa la cantidad de intentos fallidos
             int intentos = usuario.IntentosFallidos + 1;
 
-            // si llega a 3 intentos incorrectos bloquea la cuenta
-            string nuevoEstado = intentos >= 3 ? "Bloqueado" : usuario.Estado;
+            int maxIntentos = await conn.QueryFirstOrDefaultAsync<int>(
+                "SELECT valor FROM parametro WHERE codigo = 'INTENTOS_LOGIN_MAX'");
 
-            // actualiza la informacion del usuario en la base de datos
+            if (maxIntentos <= 0)
+                maxIntentos = 3;
+
+            string nuevoEstado = intentos >= maxIntentos
+                ? "Bloqueado"
+                : usuario.Estado;
+
             await conn.ExecuteAsync(
                 "UPDATE usuario SET intentos_fallidos=@intentos, estado=@estado WHERE id_usuario=@id",
                 new
