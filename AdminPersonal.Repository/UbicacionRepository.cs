@@ -1,6 +1,4 @@
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using MySqlConnector;
 using System.Data;
 
 namespace AdminPersonal.Repository
@@ -8,26 +6,22 @@ namespace AdminPersonal.Repository
     // repositorio encargado de cargar provincias, cantones y distritos desde un archivo csv
     public class UbicacionRepository
     {
-        // almacena la cadena de conexion a mysql
-        private readonly string cadenaConexion;
+        // fabrica utilizada para crear conexiones a la base de datos
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        // constructor que obtiene la cadena de conexion desde appsettings.json
-        public UbicacionRepository(IConfiguration config)
+    // constructor que recibe la fabrica de conexiones mediante inyeccion de dependencias
+    public UbicacionRepository(IDbConnectionFactory connectionFactory)
         {
-            cadenaConexion = config.GetConnectionString("DefaultConnection")!;
-        }
-
-        // abre una conexion a la base de datos
-        private MySqlConnection AbrirConexion()
-        {
-            return new MySqlConnection(cadenaConexion);
+            _connectionFactory = connectionFactory;
         }
 
         // procesa el archivo csv y registra la informacion en la base de datos
         public async Task<int> CargarCsvAsync(Stream archivo)
         {
             using var reader = new StreamReader(archivo);
-            using var conexion = AbrirConexion();
+
+            // crea una conexion utilizando la fabrica
+            using var conexion = _connectionFactory.CrearConexion();
 
             // contador de registros procesados
             int contador = 0;
@@ -142,4 +136,5 @@ namespace AdminPersonal.Repository
             return nuevoId;
         }
     }
+
 }

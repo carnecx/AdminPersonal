@@ -1,26 +1,24 @@
 ﻿using AdminPersonal.Entities;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using System.Security.Cryptography;
 using System.Text;
-
 namespace AdminPersonal.Repository
 {
     // repositorio encargado de administrar los usuarios del sistema
     public class UsuarioRepository : IUsuarioRepository
     {
-        // cadena de conexion utilizada para conectarse a mysql
-        private readonly string _connectionString;
+        // fabrica utilizada para crear conexiones a la base de datos
+        private readonly IDbConnectionFactory _connectionFactory;
 
         // clave utilizada por el algoritmo aes para encriptar contraseñas
         private static readonly byte[] AesKey =
             Encoding.UTF8.GetBytes("AdminPersonalKey1AdminPersonalK1");
 
-        // constructor que obtiene la cadena de conexion desde appsettings.json
-        public UsuarioRepository(IConfiguration config)
+        // constructor que recibe la fabrica de conexiones mediante inyeccion de dependencias
+        public UsuarioRepository(IDbConnectionFactory connectionFactory)
         {
-            _connectionString = config.GetConnectionString("DefaultConnection")!;
+            _connectionFactory = connectionFactory;
         }
 
         // encripta una contraseña antes de almacenarla en la base de datos
@@ -90,37 +88,41 @@ namespace AdminPersonal.Repository
             return Encoding.UTF8.GetString(plain);
         }
 
-        //  metodos del Login 
+        // metodos del Login
 
         // busca un usuario por nombre de usuario para el proceso de autenticacion
         public async Task<Usuario?> BuscarPorUsuarioAsync(string nombreUsuario)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // consulta la informacion del usuario segun el nombre ingresado
             return await conn.QueryFirstOrDefaultAsync<Usuario>(
                 @"SELECT id_usuario        AS IdUsuario,
-                 nombre_usuario    AS NombreUsuario,
-                 nombre_completo   AS NombreCompleto,
-                 correo            AS Correo,
-                 contrasena        AS Contrasena,
-                 estado            AS Estado,
-                 intentos_fallidos AS IntentosFallidos
-          FROM usuario WHERE nombre_usuario = @nombreUsuario",
+                         nombre_usuario    AS NombreUsuario,
+                         nombre_completo   AS NombreCompleto,
+                         correo            AS Correo,
+                         contrasena        AS Contrasena,
+                         estado            AS Estado,
+                         intentos_fallidos AS IntentosFallidos
+                  FROM usuario 
+                  WHERE nombre_usuario = @nombreUsuario",
                 new { nombreUsuario });
         }
 
         // registra un intento fallido de inicio de sesion
         public async Task RegistrarFalloAsync(Usuario usuario)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             int intentos = usuario.IntentosFallidos + 1;
 
+            // obtiene desde la tabla parametro la cantidad maxima de intentos permitidos
             int maxIntentos = await conn.QueryFirstOrDefaultAsync<int>(
                 "SELECT valor FROM parametro WHERE codigo = 'INTENTOS_LOGIN_MAX'");
 
+            // si no encuentra el parametro, usa 3 como valor de respaldo
             if (maxIntentos <= 0)
                 maxIntentos = 3;
 
@@ -141,8 +143,8 @@ namespace AdminPersonal.Repository
         // reinicia el contador de intentos despues de un login exitoso
         public async Task ReiniciarIntentosAsync(int idUsuario)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // establece los intentos fallidos nuevamente en cero
             await conn.ExecuteAsync(
@@ -153,50 +155,51 @@ namespace AdminPersonal.Repository
         // obtiene el nombre del rol asociado al usuario
         public async Task<string?> ObtenerRolAsync(int idUsuario)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // consulta el rol asignado al usuario mediante la tabla usuario_rol
             return await conn.QueryFirstOrDefaultAsync<string>(
-                @"SELECT r.nombre_rol FROM rol r
-          INNER JOIN usuario_rol ur ON ur.id_rol = r.id_rol
-          WHERE ur.id_usuario = @id LIMIT 1",
+                @"SELECT r.nombre_rol 
+                  FROM rol r
+                  INNER JOIN usuario_rol ur ON ur.id_rol = r.id_rol
+                  WHERE ur.id_usuario = @id 
+                  LIMIT 1",
                 new { id = idUsuario });
         }
 
         // obtiene el identificador numerico del rol del usuario
         public async Task<int?> ObtenerIdRolAsync(int idUsuario)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // consulta el id del rol asociado al usuario
             return await conn.QueryFirstOrDefaultAsync<int?>(
                 "SELECT id_rol FROM usuario_rol WHERE id_usuario = @id LIMIT 1",
                 new { id = idUsuario });
         }
-        // ── Métodos del SEG6 
 
         // obtiene todos los usuarios registrados junto con sus roles
         public async Task<IEnumerable<Usuario>> ObtenerTodosAsync()
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // consulta los usuarios y une las tablas usuario_rol y rol
             // group_concat permite mostrar todos los roles del usuario en una sola columna
             const string sql = @"
-        SELECT u.id_usuario        AS IdUsuario,
-               u.nombre_usuario    AS NombreUsuario,
-               u.nombre_completo   AS NombreCompleto,
-               u.correo            AS Correo,
-               u.estado            AS Estado,
-               u.intentos_fallidos AS IntentosFallidos,
-               GROUP_CONCAT(r.nombre_rol ORDER BY r.nombre_rol SEPARATOR ', ') AS RolesNombres
-        FROM usuario u
-        LEFT JOIN usuario_rol ur ON u.id_usuario = ur.id_usuario
-        LEFT JOIN rol r ON ur.id_rol = r.id_rol
-        GROUP BY u.id_usuario";
+                SELECT u.id_usuario        AS IdUsuario,
+                       u.nombre_usuario    AS NombreUsuario,
+                       u.nombre_completo   AS NombreCompleto,
+                       u.correo            AS Correo,
+                       u.estado            AS Estado,
+                       u.intentos_fallidos AS IntentosFallidos,
+                       GROUP_CONCAT(r.nombre_rol ORDER BY r.nombre_rol SEPARATOR ', ') AS RolesNombres
+                FROM usuario u
+                LEFT JOIN usuario_rol ur ON u.id_usuario = ur.id_usuario
+                LEFT JOIN rol r ON ur.id_rol = r.id_rol
+                GROUP BY u.id_usuario";
 
             // ejecuta la consulta y devuelve la lista de usuarios
             return await conn.QueryAsync<Usuario>(sql);
@@ -205,18 +208,19 @@ namespace AdminPersonal.Repository
         // obtiene un usuario especifico por su id
         public async Task<Usuario?> ObtenerPorIdAsync(int id)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // consulta los datos principales del usuario
             const string sqlUsuario = @"
-        SELECT id_usuario        AS IdUsuario,
-               nombre_usuario    AS NombreUsuario,
-               nombre_completo   AS NombreCompleto,
-               correo            AS Correo,
-               estado            AS Estado,
-               intentos_fallidos AS IntentosFallidos
-        FROM usuario WHERE id_usuario = @Id";
+                SELECT id_usuario        AS IdUsuario,
+                       nombre_usuario    AS NombreUsuario,
+                       nombre_completo   AS NombreCompleto,
+                       correo            AS Correo,
+                       estado            AS Estado,
+                       intentos_fallidos AS IntentosFallidos
+                FROM usuario 
+                WHERE id_usuario = @Id";
 
             // busca el usuario en la base de datos
             var usuario = await conn.QueryFirstOrDefaultAsync<Usuario>(
@@ -242,8 +246,8 @@ namespace AdminPersonal.Repository
         // crea un nuevo usuario con su contraseña encriptada y roles asignados
         public async Task<int> CrearAsync(Usuario u, int idUsuarioSesion)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // abre la conexion manualmente porque se usara una transaccion
             await conn.OpenAsync();
@@ -258,9 +262,9 @@ namespace AdminPersonal.Repository
 
                 // inserta el usuario y devuelve el id generado
                 const string sqlInsert = @"
-            INSERT INTO usuario (nombre_usuario, nombre_completo, correo, contrasena, estado, intentos_fallidos)
-            VALUES (@NombreUsuario, @NombreCompleto, @Correo, @Contrasena, @Estado, 0);
-            SELECT LAST_INSERT_ID();";
+                    INSERT INTO usuario (nombre_usuario, nombre_completo, correo, contrasena, estado, intentos_fallidos)
+                    VALUES (@NombreUsuario, @NombreCompleto, @Correo, @Contrasena, @Estado, 0);
+                    SELECT LAST_INSERT_ID();";
 
                 // ejecuta el insert y obtiene el nuevo id del usuario
                 int nuevoId = await conn.ExecuteScalarAsync<int>(
@@ -305,11 +309,12 @@ namespace AdminPersonal.Repository
                 throw;
             }
         }
+
         // actualiza los datos de un usuario existente
         public async Task ActualizarAsync(Usuario u, int idUsuarioSesion)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // abre la conexion porque se va a trabajar con transaccion
             await conn.OpenAsync();
@@ -327,10 +332,10 @@ namespace AdminPersonal.Repository
 
                     // consulta para actualizar incluyendo contrasena
                     const string sqlConPass = @"
-                UPDATE usuario
-                SET nombre_usuario=@NombreUsuario, nombre_completo=@NombreCompleto,
-                    correo=@Correo, contrasena=@Contrasena, estado=@Estado
-                WHERE id_usuario=@IdUsuario";
+                        UPDATE usuario
+                        SET nombre_usuario=@NombreUsuario, nombre_completo=@NombreCompleto,
+                            correo=@Correo, contrasena=@Contrasena, estado=@Estado
+                        WHERE id_usuario=@IdUsuario";
 
                     await conn.ExecuteAsync(sqlConPass, new
                     {
@@ -346,10 +351,10 @@ namespace AdminPersonal.Repository
                 {
                     // si no se escribio contrasena, se actualizan solo los demas datos
                     const string sqlSinPass = @"
-                UPDATE usuario
-                SET nombre_usuario=@NombreUsuario, nombre_completo=@NombreCompleto,
-                    correo=@Correo, estado=@Estado
-                WHERE id_usuario=@IdUsuario";
+                        UPDATE usuario
+                        SET nombre_usuario=@NombreUsuario, nombre_completo=@NombreCompleto,
+                            correo=@Correo, estado=@Estado
+                        WHERE id_usuario=@IdUsuario";
 
                     await conn.ExecuteAsync(sqlSinPass, new
                     {
@@ -392,12 +397,11 @@ namespace AdminPersonal.Repository
                 throw;
             }
         }
-
         // elimina un usuario si no tiene datos relacionados
         public async Task<(bool ok, string mensaje)> EliminarAsync(int id, int idUsuarioSesion)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             await conn.OpenAsync();
 
@@ -450,8 +454,8 @@ namespace AdminPersonal.Repository
         // cambia el estado del usuario
         public async Task CambiarEstadoAsync(int id, string nuevoEstado, int idUsuarioSesion)
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             await conn.OpenAsync();
 
@@ -478,8 +482,8 @@ namespace AdminPersonal.Repository
         // obtiene todos los roles disponibles
         public async Task<IEnumerable<Rol>> ObtenerRolesAsync()
         {
-            // abre la conexion a mysql
-            using var conn = new MySqlConnection(_connectionString);
+            // crea una conexion usando la fabrica de conexiones
+            using var conn = (MySqlConnection)_connectionFactory.CrearConexion();
 
             // consulta los roles ordenados por nombre
             return await conn.QueryAsync<Rol>(
