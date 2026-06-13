@@ -13,17 +13,70 @@ namespace AdminPersonal.Services
             _repositorio = repositorio;
         }
 
-        public IEnumerable<Pantalla> ObtenerTodos() => _repositorio.ObtenerTodos();
-        public Pantalla? ObtenerPorId(int id) => _repositorio.ObtenerPorId(id);
-        public Pantalla? BuscarDuplicado(string nombre_pantalla) => _repositorio.BuscarDuplicado(nombre_pantalla);
-        public Pantalla? BuscarDuplicadoEditar(string nombre_pantalla, int id_pantalla) => _repositorio.BuscarDuplicadoEditar(nombre_pantalla, id_pantalla);
-        public bool EstaAsignada(int id) => _repositorio.EstaAsignada(id);
-        public int Crear(Pantalla pantalla) => _repositorio.Crear(pantalla); 
-        public void Actualizar(Pantalla pantalla) => _repositorio.Actualizar(pantalla);
-        public void Eliminar(int id) => _repositorio.Eliminar(id);
-        public IEnumerable<RolPantalla> ObtenerRolesConAsignacion(int id_pantalla) => _repositorio.ObtenerRolesConAsignacion(id_pantalla);
-        public void EliminarAsignaciones(int id_pantalla) => _repositorio.EliminarAsignaciones(id_pantalla);
-        public void AsignarRoles(int id_pantalla, List<int> rolesSeleccionados) => _repositorio.AsignarRoles(id_pantalla, rolesSeleccionados);
-        public IEnumerable<string> ObtenerNombresPorRol(int id_rol) => _repositorio.ObtenerNombresPorRol(id_rol);
+        public IEnumerable<Pantalla> ObtenerTodos()
+            => _repositorio.ObtenerTodos();
+
+        public Pantalla? ObtenerPorId(int id)
+            => _repositorio.ObtenerPorId(id);
+
+        public string? ValidarYCrear(Pantalla pantalla, List<int> rolesSeleccionados)
+        {
+            if (string.IsNullOrWhiteSpace(pantalla.nombre_pantalla))
+                return "El nombre de la pantalla es obligatorio.";
+
+            if (pantalla.nombre_pantalla.Length > 100)
+                return "El nombre de la pantalla no puede superar los 100 caracteres.";
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(pantalla.nombre_pantalla, @"^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"))
+                return "El nombre de la pantalla solo debe contener letras y espacios.";
+
+            if (_repositorio.BuscarDuplicado(pantalla.nombre_pantalla) != null)
+                return "Ya existe una pantalla con ese nombre.";
+
+            var id = _repositorio.Crear(pantalla);
+
+            if (rolesSeleccionados.Any())
+                _repositorio.AsignarRoles(id, rolesSeleccionados);
+
+            return null;
+        }
+
+        public string? ValidarYActualizar(Pantalla pantalla, List<int> rolesSeleccionados)
+        {
+            if (string.IsNullOrWhiteSpace(pantalla.nombre_pantalla))
+                return "El nombre de la pantalla es obligatorio.";
+
+            if (pantalla.nombre_pantalla.Length > 100)
+                return "El nombre de la pantalla no puede superar los 100 caracteres.";
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(pantalla.nombre_pantalla, @"^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"))
+                return "El nombre de la pantalla solo debe contener letras y espacios.";
+
+            if (_repositorio.BuscarDuplicadoEditar(pantalla.nombre_pantalla, pantalla.id_pantalla) != null)
+                return "Ya existe una pantalla con ese nombre.";
+
+            _repositorio.Actualizar(pantalla);
+            _repositorio.EliminarAsignaciones(pantalla.id_pantalla);
+
+            if (rolesSeleccionados.Any())
+                _repositorio.AsignarRoles(pantalla.id_pantalla, rolesSeleccionados);
+
+            return null;
+        }
+
+        public string? Eliminar(int id)
+        {
+            if (_repositorio.EstaAsignada(id))
+                return "No se puede eliminar un registro con datos relacionados.";
+
+            _repositorio.Eliminar(id);
+            return null;
+        }
+
+        public IEnumerable<RolPantalla> ObtenerRolesConAsignacion(int id_pantalla)
+            => _repositorio.ObtenerRolesConAsignacion(id_pantalla);
+
+        public IEnumerable<string> ObtenerNombresPorRol(int id_rol)
+            => _repositorio.ObtenerNombresPorRol(id_rol);
     }
 }

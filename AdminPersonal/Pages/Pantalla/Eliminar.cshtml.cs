@@ -27,13 +27,17 @@ namespace AdminPersonal.Pages.Pantalla
                 TempData["Error"] = "No tiene permisos para realizar esta acción.";
                 return RedirectToPage("/Home/Bienvenida");
             }
-            if (_service.EstaAsignada(id))
+
+            var pantalla = _service.ObtenerPorId(id);
+
+            var error = _service.Eliminar(id);
+
+            if (error != null)
             {
-                TempData["Error"] = "No se puede eliminar un registro con datos relacionados.";
+                TempData["Error"] = error;
                 return RedirectToPage("Index");
             }
-            var pantalla = _service.ObtenerPorId(id);
-            _service.Eliminar(id);
+
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
             await _bitacoraService.RegistrarAsync(idUsuario, "Eliminación: " + JsonSerializer.Serialize(pantalla));
             TempData["Mensaje"] = "Pantalla eliminada exitosamente.";

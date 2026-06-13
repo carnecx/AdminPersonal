@@ -6,9 +6,8 @@ namespace AdminPersonal.Services.Abstract
     {
         Task<IEnumerable<Parametro>> ObtenerTodosAsync();
         Task<Parametro?> ObtenerPorIdAsync(int id);
-        Task InsertarAsync(Parametro parametro);
-        Task ActualizarAsync(Parametro parametro);
+        Task<string?> ValidarYCrearAsync(Parametro parametro);
+        Task<string?> ValidarYActualizarAsync(Parametro parametro);
         Task EliminarAsync(int id);
-        Task<bool> CodigoExisteAsync(string codigo, int? idExcluir = null);
     }
 }

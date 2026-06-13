@@ -19,14 +19,17 @@ namespace AdminPersonal.Pages.Rol
 
         public async Task<IActionResult> OnPostAsync(int id)
         {
-            if (await _rolService.EstaAsignadoAUsuarioAsync(id))
+
+            var rol = await _rolService.ObtenerPorIdAsync(id);
+
+            var error = await _rolService.EliminarAsync(id);
+
+            if (error != null)
             {
-                TempData["Error"] = "No se puede eliminar un registro con datos relacionados.";
+                TempData["Error"] = error;
                 return RedirectToPage("Index");
             }
 
-            var rol = await _rolService.ObtenerPorIdAsync(id);
-            await _rolService.EliminarAsync(id);
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
             await _bitacoraService.RegistrarAsync(idUsuario, "Eliminación: " + JsonSerializer.Serialize(rol));
             TempData["Mensaje"] = "Rol eliminado exitosamente.";
