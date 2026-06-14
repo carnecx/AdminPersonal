@@ -4,21 +4,28 @@
     ViewData["Title"] = "Concursos";
 }
 
-<h2>Lista de Concursos</h2>
-
-@if (TempData["Mensaje"] != null)
+@if (TempData["Exito"] != null || TempData["Error"] != null)
 {
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="modal fade show" style="display:block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(TempData["Error"] != null ? "Error" : "Mensaje")</h5>
+                </div>
+                <div class="modal-body">
+                    <p>@(TempData["Error"] ?? TempData["Exito"])</p>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" asp-page="/Concursos/Index">Aceptar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
 }
 
-<br />
-<a asp-page="Crear" class="btn btn-primary">Nuevo Concurso</a>
-<br />
-<br />
+<h2 class="mb-3">Administración de Concursos</h2>
+<a asp-page="Crear" class="btn btn-primary mb-3">+ Nuevo Concurso</a>
 
 <table class="table table-bordered table-striped">
     <thead class="table-dark">
@@ -46,19 +53,45 @@
                 </td>
                 <td>
                     <a asp-page="Editar" asp-route-id="@item.id_concurso" class="btn btn-warning btn-sm">Editar</a>
-
                     <form asp-page="CambiarEstado" asp-route-id="@item.id_concurso" method="post" class="d-inline">
                         <button type="submit" class="btn btn-secondary btn-sm">
                             @(item.Estado == "Vigente" ? "Marcar Vencido" : "Marcar Vigente")
                         </button>
                     </form>
-
-                    <form asp-page="Eliminar" asp-route-id="@item.id_concurso" method="post" class="d-inline"
-                          onsubmit="return confirm('¿Realmente desea eliminar el elemento seleccionado?')">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
+                    <button class="btn btn-danger btn-sm" onclick="confirmarEliminar(@item.id_concurso)">Eliminar</button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- Modal confirmación eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mensaje</h5>
+            </div>
+            <div class="modal-body">
+                <p>¿Realmente desea eliminar el elemento seleccionado?</p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" id="formEliminar">
+                    <input type="hidden" name="id" id="idEliminar" />
+                    <button type="submit" class="btn btn-danger">Sí</button>
+                </form>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarEliminar(id) {
+            document.getElementById('idEliminar').value = id;
+            document.getElementById('formEliminar').action = '/Concursos/Eliminar/' + id;
+            new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+        }
+    </script>
+}
