@@ -1,5 +1,6 @@
 using AdminPersonal.Entities;
 using AdminPersonal.Repository;
+using AdminPersonal.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text.Json;
@@ -9,12 +10,12 @@ namespace AdminPersonal.Pages.Empleados
     public class ContratarEmpleadoModel : PageModel
     {
         private readonly EmpleadoRepository _empleadoRepo;
-        private readonly string _connStr;
+        private readonly BitacoraService _bitacoraService;
 
-        public ContratarEmpleadoModel(IConfiguration configuration)
+        public ContratarEmpleadoModel(EmpleadoRepository empleadoRepo, BitacoraService bitacoraService)
         {
-            _connStr = configuration.GetConnectionString("DefaultConnection")!;
-            _empleadoRepo = new EmpleadoRepository(_connStr);
+            _empleadoRepo = empleadoRepo;
+            _bitacoraService = bitacoraService;
         }
 
         public List<Oferente> Oferentes { get; set; } = new();
@@ -31,9 +32,8 @@ namespace AdminPersonal.Pages.Empleados
 
         public async Task<IActionResult> OnGetAsync()
         {
-            // Verificar sesión
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario");
-            if (idUsuario == null) return RedirectToPage("/Login");
+            if (idUsuario == null) return RedirectToPage("/Account/Login");
 
             Oferentes = await _empleadoRepo.ObtenerOferentesDisponiblesAsync();
             Puestos = await _empleadoRepo.ObtenerPuestosAsync();
@@ -43,7 +43,7 @@ namespace AdminPersonal.Pages.Empleados
         public async Task<IActionResult> OnPostAsync()
         {
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario");
-            if (idUsuario == null) return RedirectToPage("/Login");
+            if (idUsuario == null) return RedirectToPage("/Account/Login");
 
             Oferentes = await _empleadoRepo.ObtenerOferentesDisponiblesAsync();
             Puestos = await _empleadoRepo.ObtenerPuestosAsync();
@@ -59,9 +59,9 @@ namespace AdminPersonal.Pages.Empleados
                 var numeroEmpleado = await _empleadoRepo.GenerarNumeroEmpleadoAsync();
                 await _empleadoRepo.ContratarEmpleadoAsync(IdOferenteSeleccionado, IdPuestoSeleccionado, numeroEmpleado);
 
-                // Bitácora
                 var oferente = Oferentes.FirstOrDefault(o => o.id_oferente == IdOferenteSeleccionado);
                 var puesto = Puestos.FirstOrDefault(p => p.IdPuesto == IdPuestoSeleccionado);
+
                 var detalle = new
                 {
                     accion = "Contratación de empleado",
@@ -70,13 +70,10 @@ namespace AdminPersonal.Pages.Empleados
                     identificacion = oferente?.Identificacion,
                     puesto = puesto?.Nombre
                 };
-                await _empleadoRepo.RegistrarBitacoraAsync(
-                    idUsuario.Value,
-                    JsonSerializer.Serialize(detalle)
-                );
+
+                await _bitacoraService.RegistrarAsync(idUsuario.Value, JsonSerializer.Serialize(detalle));
 
                 MensajeExito = "Empleado creado con éxito";
-              
                 Oferentes = await _empleadoRepo.ObtenerOferentesDisponiblesAsync();
             }
             catch (Exception ex)

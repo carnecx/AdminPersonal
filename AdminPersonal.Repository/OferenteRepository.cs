@@ -1,24 +1,22 @@
 ﻿using AdminPersonal.Entities;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using MySqlConnector;
+using System.Data;
 
 namespace AdminPersonal.Repository
 {
     public class OferenteRepository
     {
-        private readonly string cadenaConexion;
+        private readonly IDbConnectionFactory _dbFactory;
 
-        public OferenteRepository(IConfiguration config)
+        public OferenteRepository(IDbConnectionFactory dbFactory)
         {
-            cadenaConexion = config.GetConnectionString("DefaultConnection")!;
+            _dbFactory = dbFactory;
         }
-
-        private MySqlConnection AbrirConexion() => new MySqlConnection(cadenaConexion);
 
         public async Task<IEnumerable<Oferente>> ObtenerTodosAsync()
         {
-            using var conexion = AbrirConexion();
+            using var conexion = _dbFactory.CrearConexion();
             return await conexion.QueryAsync<Oferente>(
                 @"SELECT id_oferente, identificacion, tipo_identificacion AS TipoIdentificacion,
                          nombre_completo AS NombreCompleto, fecha_nacimiento AS FechaNacimiento
@@ -27,7 +25,7 @@ namespace AdminPersonal.Repository
 
         public async Task<Oferente?> ObtenerPorIdAsync(int id)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = _dbFactory.CrearConexion();
             return await conexion.QueryFirstOrDefaultAsync<Oferente>(
                 @"SELECT id_oferente, identificacion, tipo_identificacion AS TipoIdentificacion,
                          nombre_completo AS NombreCompleto, fecha_nacimiento AS FechaNacimiento
@@ -36,28 +34,28 @@ namespace AdminPersonal.Repository
 
         public async Task<IEnumerable<string>> ObtenerCorreosAsync(int idOferente)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = _dbFactory.CrearConexion();
             return await conexion.QueryAsync<string>(
                 "SELECT correo FROM oferente_correo WHERE id_oferente = @id", new { id = idOferente });
         }
 
         public async Task<IEnumerable<string>> ObtenerTelefonosAsync(int idOferente)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = _dbFactory.CrearConexion();
             return await conexion.QueryAsync<string>(
                 "SELECT telefono FROM oferente_telefono WHERE id_oferente = @id", new { id = idOferente });
         }
 
         public async Task<IEnumerable<int>> ObtenerConcursosIdsAsync(int idOferente)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = _dbFactory.CrearConexion();
             return await conexion.QueryAsync<int>(
                 "SELECT id_concurso FROM oferente_concurso WHERE id_oferente = @id", new { id = idOferente });
         }
 
         public async Task<int> InsertarAsync(Oferente oferente)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = (MySqlConnection)_dbFactory.CrearConexion();
             await conexion.OpenAsync();
             using var tx = await conexion.BeginTransactionAsync();
 
@@ -87,7 +85,7 @@ namespace AdminPersonal.Repository
 
         public async Task ActualizarAsync(Oferente oferente)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = (MySqlConnection)_dbFactory.CrearConexion();
             await conexion.OpenAsync();
             using var tx = await conexion.BeginTransactionAsync();
 
@@ -124,7 +122,7 @@ namespace AdminPersonal.Repository
 
         public async Task EliminarAsync(int id)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = (MySqlConnection)_dbFactory.CrearConexion();
             await conexion.OpenAsync();
             using var tx = await conexion.BeginTransactionAsync();
             await conexion.ExecuteAsync("DELETE FROM oferente_correo WHERE id_oferente=@id", new { id }, tx);
@@ -136,7 +134,7 @@ namespace AdminPersonal.Repository
 
         public async Task<bool> TieneRelacionesAsync(int id)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = _dbFactory.CrearConexion();
             var count = await conexion.QueryFirstAsync<int>(
                 @"SELECT (SELECT COUNT(*) FROM entrevista WHERE id_oferente=@id) +
                          (SELECT COUNT(*) FROM empleado   WHERE id_oferente=@id) +
@@ -146,7 +144,7 @@ namespace AdminPersonal.Repository
 
         public async Task<bool> IdentificacionExisteAsync(string identificacion, int? idExcluir = null)
         {
-            using var conexion = AbrirConexion();
+            using var conexion = _dbFactory.CrearConexion();
             return await conexion.QueryFirstOrDefaultAsync<int?>(
                 "SELECT id_oferente FROM oferente WHERE identificacion=@identificacion AND id_oferente!=@idExcluir",
                 new { identificacion, idExcluir = idExcluir ?? 0 }) != null;

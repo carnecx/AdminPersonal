@@ -20,8 +20,7 @@ namespace AdminPersonal.Pages.Areas
             string conn = _config.GetConnectionString("DefaultConnection")!;
             using var con = new MySqlConnection(conn);
             con.Open();
-            string sql = "SELECT id_area, codigo, nombre FROM area WHERE id_area = @id";
-            using var cmd = new MySqlCommand(sql, con);
+            using var cmd = new MySqlCommand("SELECT id_area, codigo, nombre FROM area WHERE id_area = @id", con);
             cmd.Parameters.AddWithValue("@id", id);
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
@@ -32,18 +31,16 @@ namespace AdminPersonal.Pages.Areas
             }
         }
 
-        public IActionResult OnPost(int IdArea)
+        public IActionResult OnPost(int id)
         {
             string conn = _config.GetConnectionString("DefaultConnection")!;
             using var con = new MySqlConnection(conn);
             con.Open();
 
-            // Guardar datos para bitácora antes de eliminar
             string datosEliminados = "";
-            string sqlOld = "SELECT codigo, nombre, id_jefatura FROM area WHERE id_area = @id";
-            using (var cmdOld = new MySqlCommand(sqlOld, con))
+            using (var cmdOld = new MySqlCommand("SELECT codigo, nombre, id_jefatura FROM area WHERE id_area = @id", con))
             {
-                cmdOld.Parameters.AddWithValue("@id", IdArea);
+                cmdOld.Parameters.AddWithValue("@id", id);
                 using var r = cmdOld.ExecuteReader();
                 if (r.Read())
                 {
@@ -58,33 +55,29 @@ namespace AdminPersonal.Pages.Areas
                 }
             }
 
-            this.IdArea = IdArea;
-
             try
             {
-                string sql = "DELETE FROM area WHERE id_area = @id";
-                using var cmd = new MySqlCommand(sql, con);
-                cmd.Parameters.AddWithValue("@id", IdArea);
+                using var cmd = new MySqlCommand("DELETE FROM area WHERE id_area = @id", con);
+                cmd.Parameters.AddWithValue("@id", id);
                 cmd.ExecuteNonQuery();
 
-                // Bitácora
                 var idUsuario = HttpContext.Session.GetInt32("IdUsuario");
                 if (idUsuario != null)
                 {
-                    string sqlBit = "INSERT INTO bitacora (id_usuario, descripcion) VALUES (@u, @d)";
-                    using var cmdBit = new MySqlCommand(sqlBit, con);
+                    using var cmdBit = new MySqlCommand(
+                        "INSERT INTO bitacora (id_usuario, descripcion) VALUES (@u, @d)", con);
                     cmdBit.Parameters.AddWithValue("@u", idUsuario);
                     cmdBit.Parameters.AddWithValue("@d", $"Eliminación de Área: {datosEliminados}");
                     cmdBit.ExecuteNonQuery();
                 }
 
-                TempData["MensajeExito"] = "Área eliminada correctamente.";
+                TempData["Exito"] = "Área eliminada correctamente.";
                 return RedirectToPage("/Areas/Index");
             }
             catch (MySqlException ex) when (ex.Number == 1451)
             {
-                MensajeError = "No se puede eliminar un registro con datos relacionados.";
-                return Page();
+                TempData["Error"] = "No se puede eliminar un registro con datos relacionados.";
+                return RedirectToPage("/Areas/Index");
             }
         }
     }
