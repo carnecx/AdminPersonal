@@ -6,9 +6,8 @@ namespace AdminPersonal.Services.Abstract
     {
         Task<IEnumerable<Compania>> ObtenerTodosAsync();
         Task<Compania?> ObtenerPorIdAsync(int id);
-        Task InsertarAsync(Compania compania);
-        Task ActualizarAsync(Compania compania);
+        Task<string?> ValidarYCrearAsync(Compania compania);
+        Task<string?> ValidarYActualizarAsync(Compania compania);
         Task EliminarAsync(int id);
-        Task<bool> CodigoExisteAsync(string codigo, int? idExcluir = null);
     }
 }

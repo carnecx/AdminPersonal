@@ -1,57 +1,33 @@
 ﻿@page
 @model AdminPersonal.Pages.Usuarios.IndexModel
-
 @{
     ViewData["Title"] = "Administración de Usuarios";
 }
 
-<h2 class="mb-3">Administración de Usuarios</h2>
-
 @if (TempData["Exito"] != null || TempData["Error"] != null)
 {
-<div class="modal fade show" style="display:block;" tabindex="-1">
-
-
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    @(TempData["Error"] != null ? "Error" : "Mensaje")
-                </h5>
+    <div class="modal fade show" style="display:block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(TempData["Error"] != null ? "Error" : "Mensaje")</h5>
+                </div>
+                <div class="modal-body">
+                    <p>@(TempData["Error"] ?? TempData["Exito"])</p>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" asp-page="/Usuarios/Index">Aceptar</a>
+                </div>
             </div>
-
-            <div class="modal-body">
-                <p>
-                    @(TempData["Error"] ?? TempData["Exito"])
-                </p>
-            </div>
-
-            <div class="modal-footer">
-                <a class="btn btn-primary"
-                   asp-page="/Usuarios/Index">
-                    Aceptar
-                </a>
-            </div>
-
         </div>
-
     </div>
-
-</div>
-
-<div class="modal-backdrop fade show"></div>
-
+    <div class="modal-backdrop fade show"></div>
 }
 
-<a asp-page="Crear" class="btn btn-primary mb-3">
-    + Nuevo Usuario
-</a>
+<h2 class="mb-3">Administración de Usuarios</h2>
+<a asp-page="Crear" class="btn btn-primary mb-3">+ Nuevo Usuario</a>
 
 <table class="table table-bordered table-striped">
-
-   
     <thead class="table-dark">
         <tr>
             <th>#</th>
@@ -63,25 +39,16 @@
             <th>Acciones</th>
         </tr>
     </thead>
-
     <tbody>
-
         @foreach (var u in Model.Usuarios)
         {
             <tr>
-
                 <td>@u.IdUsuario</td>
-
                 <td>@u.NombreUsuario</td>
-
                 <td>@u.NombreCompleto</td>
-
                 <td>@u.Correo</td>
-
                 <td>@u.RolesNombres</td>
-
                 <td>
-
                     @if (u.Estado == "Activo")
                     {
                         <span class="badge bg-success">Activo</span>
@@ -94,76 +61,57 @@
                     {
                         <span class="badge bg-danger">Bloqueado</span>
                     }
-
                 </td>
-
                 <td>
-
-                    <a asp-page="Editar"
-                       asp-route-id="@u.IdUsuario"
-                       class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-
-                    <form method="post"
-                          asp-page-handler="CambiarEstado"
-                          class="d-inline">
-
+                    <a asp-page="Editar" asp-route-id="@u.IdUsuario" class="btn btn-warning btn-sm">Editar</a>
+                    <form method="post" asp-page-handler="CambiarEstado" class="d-inline">
                         @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="id"
-                               value="@u.IdUsuario" />
-
+                        <input type="hidden" name="id" value="@u.IdUsuario" />
                         @if (u.Estado == "Activo")
                         {
-                            <input type="hidden"
-                                   name="nuevoEstado"
-                                   value="Inactivo" />
-
-                            <button type="submit"
-                                    class="btn btn-secondary btn-sm">
-                                Inactivar
-                            </button>
+                            <input type="hidden" name="nuevoEstado" value="Inactivo" />
+                            <button type="submit" class="btn btn-secondary btn-sm">Inactivar</button>
                         }
                         else
                         {
-                            <input type="hidden"
-                                   name="nuevoEstado"
-                                   value="Activo" />
-
-                            <button type="submit"
-                                    class="btn btn-primary btn-sm">
-                                Activar
-                            </button>
+                            <input type="hidden" name="nuevoEstado" value="Activo" />
+                            <button type="submit" class="btn btn-primary btn-sm">Activar</button>
                         }
-
                     </form>
-
-                    <form method="post"
-                          asp-page-handler="Eliminar"
-                          class="d-inline"
-                          onsubmit="return confirm('¿Está seguro de eliminar este usuario?');">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="id"
-                               value="@u.IdUsuario" />
-
-                        <button type="submit"
-                                class="btn btn-danger btn-sm">
-                            Eliminar
-                        </button>
-
-                    </form>
-
+                    <button class="btn btn-danger btn-sm" onclick="confirmarEliminar(@u.IdUsuario)">Eliminar</button>
                 </td>
-
             </tr>
         }
-
     </tbody>
-   
-
 </table>
+
+<!-- Modal confirmación eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mensaje</h5>
+            </div>
+            <div class="modal-body">
+                <p>¿Realmente desea eliminar el elemento seleccionado?</p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" asp-page-handler="Eliminar" id="formEliminar">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="idEliminar" />
+                    <button type="submit" class="btn btn-danger">Sí</button>
+                </form>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarEliminar(id) {
+            document.getElementById('idEliminar').value = id;
+            new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+        }
+    </script>
+}

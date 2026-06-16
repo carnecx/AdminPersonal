@@ -60,6 +60,7 @@ builder.Services.AddScoped<IOferenteService, OferenteService>();
 // registra los repositorios y servicios de concursos
 builder.Services.AddScoped<ConcursoRepository>();
 builder.Services.AddScoped<IConcursoService, ConcursoService>();
+builder.Services.AddScoped<EmpleadoRepository>();
 
 // configura la sesion para que venza despues de 5 minutos de inactividad
 builder.Services.AddSession(options =>

@@ -6,10 +6,8 @@ namespace AdminPersonal.Services.Abstract
     {
         Task<IEnumerable<Rol>> ObtenerTodosAsync();
         Task<Rol?> ObtenerPorIdAsync(int id);
-        Task InsertarAsync(Rol rol);
-        Task ActualizarAsync(Rol rol);
-        Task EliminarAsync(int id);
-        Task<bool> NombreExisteAsync(string nombre, int? idExcluir = null);
-        Task<bool> EstaAsignadoAUsuarioAsync(int id);
+        Task<string?> ValidarYCrearAsync(Rol rol);
+        Task<string?> ValidarYActualizarAsync(Rol rol);
+        Task<string?> EliminarAsync(int id);
     }
 }

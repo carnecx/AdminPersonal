@@ -14,43 +14,51 @@ namespace AdminPersonal.Services
         }
 
         public IEnumerable<RequisitoPuesto> ObtenerTodos()
-        {
-            return _repositorio.ObtenerTodos();
-        }
+            => _repositorio.ObtenerTodos();
 
         public RequisitoPuesto? ObtenerPorId(int id)
-        {
-            return _repositorio.ObtenerPorId(id);
-        }
+            => _repositorio.ObtenerPorId(id);
 
         public IEnumerable<dynamic> ObtenerPuestos()
-        {
-            return _repositorio.ObtenerPuestos();
-        }
+            => _repositorio.ObtenerPuestos();
 
-        public RequisitoPuesto? BuscarDuplicado(string nombre_requisito, int id_puesto)
+        public string? ValidarYCrear(RequisitoPuesto requisito)
         {
-            return _repositorio.BuscarDuplicado(nombre_requisito, id_puesto);
-        }
+            if (string.IsNullOrWhiteSpace(requisito.nombre_requisito))
+                return "El nombre del requisito es obligatorio.";
 
-        public RequisitoPuesto? BuscarDuplicadoEditar(string nombre_requisito, int id_puesto, int id_requisito)
-        {
-            return _repositorio.BuscarDuplicadoEditar(nombre_requisito, id_puesto, id_requisito);
-        }
+            if (requisito.nombre_requisito.Length > 200)
+                return "El nombre del requisito no puede superar los 200 caracteres.";
 
-        public void Crear(RequisitoPuesto requisito)
-        {
+            if (requisito.id_puesto == 0)
+                return "Debe seleccionar un puesto.";
+
+            if (_repositorio.RequisitoExiste(requisito.nombre_requisito, requisito.id_puesto))
+                return "Ya existe ese requisito para este puesto.";
+
             _repositorio.Crear(requisito);
+            return null;
         }
 
-        public void Actualizar(RequisitoPuesto requisito)
+        public string? ValidarYActualizar(RequisitoPuesto requisito)
         {
+            if (string.IsNullOrWhiteSpace(requisito.nombre_requisito))
+                return "El nombre del requisito es obligatorio.";
+
+            if (requisito.nombre_requisito.Length > 200)
+                return "El nombre del requisito no puede superar los 200 caracteres.";
+
+            if (requisito.id_puesto == 0)
+                return "Debe seleccionar un puesto.";
+
+            if (_repositorio.RequisitoExiste(requisito.nombre_requisito, requisito.id_puesto, requisito.id_requisito))
+                return "Ya existe ese requisito para este puesto.";
+
             _repositorio.Actualizar(requisito);
+            return null;
         }
 
         public void Eliminar(int id)
-        {
-            _repositorio.Eliminar(id);
-        }
+            => _repositorio.Eliminar(id);
     }
 }

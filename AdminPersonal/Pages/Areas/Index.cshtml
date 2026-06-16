@@ -4,23 +4,33 @@
     ViewData["Title"] = "Administración de Áreas";
 }
 
-<h2>Administración de Áreas</h2>
-
-@if (!string.IsNullOrEmpty(Model.MensajeExito))
+@if (TempData["Exito"] != null || TempData["Error"] != null)
 {
-    <div class="alert alert-success">@Model.MensajeExito</div>
-}
-@if (!string.IsNullOrEmpty(Model.MensajeError))
-{
-    <div class="alert alert-danger">@Model.MensajeError</div>
+    <div class="modal fade show" style="display:block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(TempData["Error"] != null ? "Error" : "Mensaje")</h5>
+                </div>
+                <div class="modal-body">
+                    <p>@(TempData["Error"] ?? TempData["Exito"])</p>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" asp-page="/Areas/Index">Aceptar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
 }
 
-<a href="/Areas/Crear" class="btn btn-primary mb-3">Nuevo</a>
+<h2 class="mb-3">Administración de Áreas</h2>
+<a href="/Areas/Crear" class="btn btn-primary mb-3">+ Nueva Área</a>
 
 <table class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
-            <th>ID</th>
+            <th>#</th>
             <th>Código</th>
             <th>Nombre</th>
             <th>Jefatura</th>
@@ -37,9 +47,40 @@
                 <td>@area.NombreJefatura</td>
                 <td>
                     <a href="/Areas/Editar?id=@area.IdArea" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="/Areas/Eliminar?id=@area.IdArea" class="btn btn-danger btn-sm">Eliminar</a>
+                    <button class="btn btn-danger btn-sm" onclick="confirmarEliminar(@area.IdArea)">Eliminar</button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- Modal confirmación eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mensaje</h5>
+            </div>
+            <div class="modal-body">
+                <p>¿Realmente desea eliminar el elemento seleccionado?</p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" id="formEliminar">
+                    <input type="hidden" name="id" id="idEliminar" />
+                    <button type="submit" class="btn btn-danger">Sí</button>
+                </form>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarEliminar(id) {
+            document.getElementById('idEliminar').value = id;
+            document.getElementById('formEliminar').action = '/Areas/Eliminar?id=' + id;
+            new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+        }
+    </script>
+}

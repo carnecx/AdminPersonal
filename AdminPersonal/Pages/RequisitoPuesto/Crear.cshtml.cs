@@ -30,25 +30,15 @@ namespace AdminPersonal.Pages.RequisitoPuesto
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (Requisito.id_puesto <= 0)
+            var error = _service.ValidarYCrear(Requisito);
+
+            if (error != null)
             {
-                ViewData["Error"] = "Debe seleccionar un puesto.";
+                ViewData["Error"] = error;
                 Puestos = _service.ObtenerPuestos();
                 return Page();
             }
-            if (string.IsNullOrWhiteSpace(Requisito.nombre_requisito))
-            {
-                ViewData["Error"] = "El nombre del requisito es obligatorio.";
-                Puestos = _service.ObtenerPuestos();
-                return Page();
-            }
-            if (_service.BuscarDuplicado(Requisito.nombre_requisito, Requisito.id_puesto) != null)
-            {
-                ViewData["Error"] = "Ya existe ese requisito para este puesto.";
-                Puestos = _service.ObtenerPuestos();
-                return Page();
-            }
-            _service.Crear(Requisito);
+
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
             await _bitacoraService.RegistrarAsync(idUsuario, "Creación: " + JsonSerializer.Serialize(Requisito));
             TempData["Mensaje"] = "Requisito creado exitosamente.";

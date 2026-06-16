@@ -35,35 +35,14 @@ namespace AdminPersonal.Pages.Compania
         {
             var anterior = await _companiaService.ObtenerPorIdAsync(Compania.id_compania);
 
-            // Validar código obligatorio
-            if (string.IsNullOrWhiteSpace(Compania.Codigo))
+            var error = await _companiaService.ValidarYActualizarAsync(Compania);
+
+            if (error != null)
             {
-                ViewData["Error"] = "El código es obligatorio.";
+                ViewData["Error"] = error;
                 return Page();
             }
 
-            // Validar nombre obligatorio
-            if (string.IsNullOrWhiteSpace(Compania.Nombre))
-            {
-                ViewData["Error"] = "El nombre es obligatorio.";
-                return Page();
-            }
-
-            // Validar longitud del nombre
-            if (Compania.Nombre.Length > 150)
-            {
-                ViewData["Error"] = "El nombre no puede superar los 150 caracteres.";
-                return Page();
-            }
-
-            // Validar código duplicado excluyendo el registro actual
-            if (await _companiaService.CodigoExisteAsync(Compania.Codigo, Compania.id_compania))
-            {
-                ViewData["Error"] = "Ya existe una compañía con ese código.";
-                return Page();
-            }
-
-            await _companiaService.ActualizarAsync(Compania);
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
             await _bitacoraService.RegistrarAsync(idUsuario,"Actualización: Anterior=" + JsonSerializer.Serialize(anterior) + " Nuevo=" + JsonSerializer.Serialize(Compania));
             TempData["Mensaje"] = "Compañía actualizada exitosamente.";

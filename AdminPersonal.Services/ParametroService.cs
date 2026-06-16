@@ -14,33 +14,48 @@ namespace AdminPersonal.Services
         }
 
         public async Task<IEnumerable<Parametro>> ObtenerTodosAsync()
-        {
-            return await _repositorio.ObtenerTodosAsync();
-        }
+            => await _repositorio.ObtenerTodosAsync();
 
         public async Task<Parametro?> ObtenerPorIdAsync(int id)
-        {
-            return await _repositorio.ObtenerPorIdAsync(id);
-        }
+            => await _repositorio.ObtenerPorIdAsync(id);
 
-        public async Task InsertarAsync(Parametro parametro)
+        public async Task<string?> ValidarYCrearAsync(Parametro parametro)
         {
+            if (string.IsNullOrWhiteSpace(parametro.Codigo))
+                return "El código es obligatorio.";
+
+            if (string.IsNullOrWhiteSpace(parametro.Valor))
+                return "El valor es obligatorio.";
+
+            if (parametro.Valor.Length > 500)
+                return "El valor no puede superar los 500 caracteres.";
+
+            if (await _repositorio.CodigoExisteAsync(parametro.Codigo))
+                return "Ya existe un parámetro con ese código.";
+
             await _repositorio.InsertarAsync(parametro);
+            return null;
         }
 
-        public async Task ActualizarAsync(Parametro parametro)
+        public async Task<string?> ValidarYActualizarAsync(Parametro parametro)
         {
+            if (string.IsNullOrWhiteSpace(parametro.Codigo))
+                return "El código es obligatorio.";
+
+            if (string.IsNullOrWhiteSpace(parametro.Valor))
+                return "El valor es obligatorio.";
+
+            if (parametro.Valor.Length > 500)
+                return "El valor no puede superar los 500 caracteres.";
+
+            if (await _repositorio.CodigoExisteAsync(parametro.Codigo, parametro.id_parametro))
+                return "Ya existe un parámetro con ese código.";
+
             await _repositorio.ActualizarAsync(parametro);
+            return null;
         }
 
         public async Task EliminarAsync(int id)
-        {
-            await _repositorio.EliminarAsync(id);
-        }
-
-        public async Task<bool> CodigoExisteAsync(string codigo, int? idExcluir = null)
-        {
-            return await _repositorio.CodigoExisteAsync(codigo, idExcluir);
-        }
+            => await _repositorio.EliminarAsync(id);
     }
 }

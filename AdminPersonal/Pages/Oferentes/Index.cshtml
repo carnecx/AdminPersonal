@@ -4,48 +4,83 @@
     ViewData["Title"] = "Oferentes";
 }
 
-<h2>Lista de Oferentes</h2>
-
-@if (TempData["Mensaje"] != null)
+@if (TempData["Exito"] != null || TempData["Error"] != null)
 {
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="modal fade show" style="display:block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(TempData["Error"] != null ? "Error" : "Mensaje")</h5>
+                </div>
+                <div class="modal-body">
+                    <p>@(TempData["Error"] ?? TempData["Exito"])</p>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" asp-page="/Oferentes/Index">Aceptar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
 }
 
-<br />
-<a asp-page="Crear" class="btn btn-primary">Nuevo Oferente</a>
-<br />
-<br />
+<h2 class="mb-3">Administración de Oferentes</h2>
+<a asp-page="Crear" class="btn btn-primary mb-3">+ Nuevo Oferente</a>
 
 <table class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
+            <th>#</th>
             <th>Identificación</th>
-            <th>Tipo</th>
-            <th>Nombre Completo</th>
-            <th>Fecha Nacimiento</th>
+            <th>Nombre completo</th>
+            <th>Fecha nacimiento</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Oferentes)
+        @foreach (var o in Model.Oferentes)
         {
             <tr>
-                <td>@item.Identificacion</td>
-                <td>@item.TipoIdentificacion</td>
-                <td>@item.NombreCompleto</td>
-                <td>@item.FechaNacimiento.ToString("dd/MM/yyyy")</td>
+                <td>@o.id_oferente</td>
+                <td>@o.Identificacion</td>
+                <td>@o.NombreCompleto</td>
+                <td>@o.FechaNacimiento.ToString("dd/MM/yyyy")</td>
                 <td>
-                    <a asp-page="Editar" asp-route-id="@item.id_oferente" class="btn btn-warning btn-sm">Editar</a>
-                    <form asp-page="Eliminar" asp-route-id="@item.id_oferente" method="post" class="d-inline"
-                          onsubmit="return confirm('¿Realmente desea eliminar el elemento seleccionado?')">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
+                    <a asp-page="Editar" asp-route-id="@o.id_oferente" class="btn btn-warning btn-sm">Editar</a>
+                    <button class="btn btn-danger btn-sm" onclick="confirmarEliminar(@o.id_oferente)">Eliminar</button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- Modal confirmación eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mensaje</h5>
+            </div>
+            <div class="modal-body">
+                <p>¿Realmente desea eliminar el elemento seleccionado?</p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" id="formEliminar">
+                    <input type="hidden" name="id" id="idEliminar" />
+                    <button type="submit" class="btn btn-danger">Sí</button>
+                </form>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarEliminar(id) {
+            document.getElementById('idEliminar').value = id;
+            document.getElementById('formEliminar').action = '/Oferentes/Eliminar/' + id;
+            new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+        }
+    </script>
+}

@@ -6,17 +6,54 @@
 
 <h2>Parámetros del Sistema</h2>
 
-@if (TempData["Mensaje"] != null)
+@if (TempData["Mensaje"] != null || TempData["Error"] != null)
 {
-    <div class="alert alert-success">@TempData["Mensaje"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="modal fade" id="mensajeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(TempData["Error"] != null ? "Error" : "Información")
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    @(TempData["Error"] ?? TempData["Mensaje"])
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-primary"
+                            data-bs-dismiss="modal">
+                        Aceptar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new bootstrap.Modal(
+                document.getElementById('mensajeModal')
+            ).show();
+        });
+    </script>
 }
 
 <br />
-<a asp-page="Crear" class="btn btn-primary">Nuevo Parámetro</a>
+
+<a asp-page="Crear" class="btn btn-primary">
+    Nuevo Parámetro
+</a>
+
 <br />
 <br />
 
@@ -28,20 +65,94 @@
             <th>Acciones</th>
         </tr>
     </thead>
+
     <tbody>
         @foreach (var item in Model.Parametros)
         {
             <tr>
                 <td>@item.Codigo</td>
                 <td>@item.Valor</td>
+
                 <td>
-                    <a asp-page="Editar" asp-route-id="@item.id_parametro" class="btn btn-warning btn-sm">Editar</a>
-                    <form asp-page="Eliminar" asp-route-id="@item.id_parametro" method="post" class="d-inline"
-                          onsubmit="return confirm('¿Realmente desea eliminar el elemento seleccionado?')">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
+                    <a asp-page="Editar"
+                       asp-route-id="@item.id_parametro"
+                       class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
+
+                    <button type="button"
+                            class="btn btn-danger btn-sm btnEliminar"
+                            data-id="@item.id_parametro">
+                        Eliminar
+                    </button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<div class="modal fade" id="eliminarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Confirmar eliminación
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                ¿Realmente desea eliminar el elemento seleccionado?
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <form method="post"
+                      asp-page="Eliminar"
+                      id="formEliminar">
+
+                    <input type="hidden"
+                           id="idEliminar"
+                           name="id" />
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Eliminar
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.btnEliminar')
+        .forEach(btn => {
+
+            btn.addEventListener('click', function () {
+
+                document.getElementById('idEliminar').value =
+                    this.dataset.id;
+
+                new bootstrap.Modal(
+                    document.getElementById('eliminarModal')
+                ).show();
+
+            });
+
+        });
+</script>

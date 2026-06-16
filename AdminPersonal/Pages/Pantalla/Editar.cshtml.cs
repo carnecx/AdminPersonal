@@ -51,37 +51,19 @@ namespace AdminPersonal.Pages.Pantalla
                 TempData["Error"] = "No tiene permisos para acceder a esta sección.";
                 return RedirectToPage("/Home/Bienvenida");
             }
+
+
             var anterior = _service.ObtenerPorId(Pantalla.id_pantalla);
-            if (string.IsNullOrWhiteSpace(Pantalla.nombre_pantalla))
+            var error = _service.ValidarYActualizar(Pantalla, RolesSeleccionados);
+
+            if (error != null)
             {
-                ViewData["Error"] = "El nombre de la pantalla es obligatorio.";
+                ViewData["Error"] = error;
                 Roles = _service.ObtenerRolesConAsignacion(Pantalla.id_pantalla);
                 return Page();
             }
-            if (Pantalla.nombre_pantalla.Length > 100)
-            {
-                ViewData["Error"] = "El nombre de la pantalla no puede superar los 100 caracteres.";
-                Roles = _service.ObtenerRolesConAsignacion(Pantalla.id_pantalla);
-                return Page();
-            }
-            if (!System.Text.RegularExpressions.Regex.IsMatch(Pantalla.nombre_pantalla, @"^[a-zA-Z ]+$"))
-            {
-                ViewData["Error"] = "El nombre de la pantalla solo debe contener letras y espacios.";
-                Roles = _service.ObtenerRolesConAsignacion(Pantalla.id_pantalla);
-                return Page();
-            }
-            if (_service.BuscarDuplicadoEditar(Pantalla.nombre_pantalla, Pantalla.id_pantalla) != null)
-            {
-                ViewData["Error"] = "Ya existe una pantalla con ese nombre.";
-                Roles = _service.ObtenerRolesConAsignacion(Pantalla.id_pantalla);
-                return Page();
-            }
-            _service.Actualizar(Pantalla);
-            _service.EliminarAsignaciones(Pantalla.id_pantalla);
-            if (RolesSeleccionados.Any())
-            {
-                _service.AsignarRoles(Pantalla.id_pantalla, RolesSeleccionados);
-            }
+
+
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
             await _bitacoraService.RegistrarAsync(idUsuario, "Actualización: Anterior=" + JsonSerializer.Serialize(anterior) + " Nuevo=" + JsonSerializer.Serialize(Pantalla));
             TempData["Mensaje"] = "Pantalla actualizada exitosamente.";

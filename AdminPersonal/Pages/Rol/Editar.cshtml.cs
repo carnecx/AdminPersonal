@@ -34,27 +34,15 @@ namespace AdminPersonal.Pages.Rol
         public async Task<IActionResult> OnPostAsync()
         {
             var anterior = await _rolService.ObtenerPorIdAsync(Rol.id_rol);
-            if (string.IsNullOrWhiteSpace(Rol.nombre_rol))
+            var error = await _rolService.ValidarYActualizarAsync(Rol);
+
+            if (error != null)
             {
-                ViewData["Error"] = "El nombre del rol no puede estar vacÌo.";
+                ViewData["Error"] = error;
                 return Page();
             }
-            if (Rol.nombre_rol.Length > 40)
-            {
-                ViewData["Error"] = "El nombre del rol no puede superar los 40 caracteres.";
-                return Page();
-            }
-            if (!System.Text.RegularExpressions.Regex.IsMatch(Rol.nombre_rol, @"^[a-zA-Z·ÈÌÛ˙¡…Õ”⁄Ò— ]+$"))
-            {
-                ViewData["Error"] = "El nombre del rol solo debe contener letras y espacios.";
-                return Page();
-            }
-            if (await _rolService.NombreExisteAsync(Rol.nombre_rol, Rol.id_rol))
-            {
-                ViewData["Error"] = "El nombre del rol ya existe.";
-                return Page();
-            }
-            await _rolService.ActualizarAsync(Rol);
+
+
             var idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 0;
             await _bitacoraService.RegistrarAsync(idUsuario, "ActualizaciÛn: Anterior=" + JsonSerializer.Serialize(anterior) + " Nuevo=" + JsonSerializer.Serialize(Rol));
             TempData["Mensaje"] = "Rol actualizado exitosamente.";
