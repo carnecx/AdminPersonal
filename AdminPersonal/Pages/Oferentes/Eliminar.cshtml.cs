@@ -32,7 +32,7 @@ namespace AdminPersonal.Pages.Oferentes
             await _bitacoraService.RegistrarAsync(idUsuario,
                 $"Eliminar Oferente: {JsonSerializer.Serialize(oferente)}");
 
-            TempData["Mensaje"] = "Oferente eliminado exitosamente.";
+            TempData["Exito"] = "Oferente eliminado exitosamente.";
             return RedirectToPage("Index");
         }
     }

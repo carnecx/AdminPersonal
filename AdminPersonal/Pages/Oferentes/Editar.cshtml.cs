@@ -1,4 +1,4 @@
-using AdminPersonal.Entities;
+ï»¿using AdminPersonal.Entities;
 using AdminPersonal.Services;
 using AdminPersonal.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
@@ -47,26 +47,26 @@ namespace AdminPersonal.Pages.Oferentes
             Telefonos = Telefonos.Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
 
             if (string.IsNullOrWhiteSpace(Oferente.Identificacion))
-            { ViewData["Error"] = "La identificación es obligatoria."; return Page(); }
+            { ViewData["Error"] = "La identificaciï¿½n es obligatoria."; return Page(); }
 
             if (string.IsNullOrWhiteSpace(Oferente.TipoIdentificacion))
-            { ViewData["Error"] = "El tipo de identificación es obligatorio."; return Page(); }
+            { ViewData["Error"] = "El tipo de identificaciï¿½n es obligatorio."; return Page(); }
 
             if (string.IsNullOrWhiteSpace(Oferente.NombreCompleto))
             { ViewData["Error"] = "El nombre completo es obligatorio."; return Page(); }
 
             if (Correos.Count == 0)
-            { ViewData["Error"] = "Debe ingresar al menos un correo electrónico."; return Page(); }
+            { ViewData["Error"] = "Debe ingresar al menos un correo electrï¿½nico."; return Page(); }
 
             foreach (var correo in Correos)
                 if (!correo.Contains("@") || !correo.Contains("."))
-                { ViewData["Error"] = $"El correo '{correo}' no tiene formato válido."; return Page(); }
+                { ViewData["Error"] = $"El correo '{correo}' no tiene formato vï¿½lido."; return Page(); }
 
             if (Telefonos.Count == 0)
-            { ViewData["Error"] = "Debe ingresar al menos un teléfono."; return Page(); }
+            { ViewData["Error"] = "Debe ingresar al menos un telï¿½fono."; return Page(); }
 
             if (await _oferenteService.IdentificacionExisteAsync(Oferente.Identificacion, Oferente.id_oferente))
-            { ViewData["Error"] = "Ya existe otro oferente con esa identificación."; return Page(); }
+            { ViewData["Error"] = "Ya existe otro oferente con esa identificaciï¿½n."; return Page(); }
 
             var anterior = await _oferenteService.ObtenerPorIdAsync(Oferente.id_oferente);
             Oferente.Correos = Correos;
@@ -78,7 +78,7 @@ namespace AdminPersonal.Pages.Oferentes
             await _bitacoraService.RegistrarAsync(idUsuario,
                 $"Actualizar Oferente - Anterior: {JsonSerializer.Serialize(anterior)} | Nuevo: {JsonSerializer.Serialize(new { Oferente.id_oferente, Oferente.Identificacion, Oferente.NombreCompleto })}");
 
-            TempData["Mensaje"] = "Oferente actualizado exitosamente.";
+            TempData["Exito"] = "Oferente actualizado exitosamente.";
             return RedirectToPage("Index");
         }
     }

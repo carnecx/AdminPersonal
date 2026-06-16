@@ -8,18 +8,24 @@
     <h2>Contratar Empleado</h2>
     <hr />
 
-    @if (!string.IsNullOrEmpty(Model.MensajeExito))
+    @if (!string.IsNullOrEmpty(Model.MensajeExito) || !string.IsNullOrEmpty(Model.MensajeError))
     {
-        <div class="alert alert-success" role="alert">
-            @Model.MensajeExito
+        <div class="modal fade show" style="display:block;" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@(!string.IsNullOrEmpty(Model.MensajeError) ? "Error" : "Mensaje")</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>@(Model.MensajeError ?? Model.MensajeExito)</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" asp-page="/Empleados/ContratarEmpleado">Aceptar</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    }
-
-    @if (!string.IsNullOrEmpty(Model.MensajeError))
-    {
-        <div class="alert alert-danger" role="alert">
-            @Model.MensajeError
-        </div>
+        <div class="modal-backdrop fade show"></div>
     }
 
     <form method="post">
