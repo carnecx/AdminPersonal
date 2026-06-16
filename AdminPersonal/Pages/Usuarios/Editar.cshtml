@@ -1,154 +1,93 @@
 ﻿@page
-@model AdminPersonal.Pages.Usuarios.IndexModel
+@model AdminPersonal.Pages.Usuarios.EditarModel
 @{
-    ViewData["Title"] = "Administración de Usuarios";
+    ViewData["Title"] = "Editar Usuario";
 }
 
-<!-- titulo principal de la pantalla -->
-<h2 class="mb-3">Administración de Usuarios</h2>
+<h2 class="mb-3">Editar Usuario</h2>
 
-<!-- mensaje mostrado cuando una accion se realiza correctamente -->
-@if (TempData["Exito"] != null)
-{
-    <div class="alert alert-success">@TempData["Exito"]</div>
-}
+<a href="/Usuarios" class="btn btn-secondary mb-3">← Volver</a>
 
-<!-- mensaje mostrado cuando ocurre un error -->
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
+<form method="post">
+    <input type="hidden" asp-for="Usuario.IdUsuario" />
 
-<!-- boton para registrar un nuevo usuario -->
-<a asp-page="Crear" class="btn btn-primary mb-3">
-    + Nuevo Usuario
-</a>
-
-<!-- tabla que muestra los usuarios registrados -->
-<table class="table table-bordered table-striped">
-
-    <thead class="table-dark">
-        <tr>
-            <th>#</th>
-            <th>Nombre de usuario</th>
-            <th>Nombre completo</th>
-            <th>Correo</th>
-            <th>Roles</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-        <!-- recorre todos los usuarios obtenidos de la base de datos -->
-        @foreach (var u in Model.Usuarios)
+    <div class="mb-3">
+        <label class="form-label">Nombre de usuario</label>
+        <input asp-for="Usuario.NombreUsuario" class="form-control" />
+        <span asp-validation-for="Usuario.NombreUsuario" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Nombre completo</label>
+        <input asp-for="Usuario.NombreCompleto" class="form-control" />
+        <span asp-validation-for="Usuario.NombreCompleto" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input asp-for="Usuario.Correo" class="form-control" type="email" />
+        <span asp-validation-for="Usuario.Correo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input asp-for="Usuario.Contrasena" class="form-control" type="password" placeholder="Dejar en blanco para mantener la actual" />
+        <span asp-validation-for="Usuario.Contrasena" class="text-danger"></span>
+        <div class="form-text">Deje este campo vacío si no desea cambiar la contraseña.</div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Estado</label>
+        <select asp-for="Usuario.Estado" class="form-select">
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+            <option value="Bloqueado">Bloqueado</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Roles</label>
+        @foreach (var rol in Model.Roles)
         {
-            <tr>
-
-                <!-- identificador del usuario -->
-                <td>@u.IdUsuario</td>
-
-                <!-- nombre de usuario utilizado para iniciar sesion -->
-                <td>@u.NombreUsuario</td>
-
-                <!-- nombre completo del usuario -->
-                <td>@u.NombreCompleto</td>
-
-                <!-- correo electronico -->
-                <td>@u.Correo</td>
-
-                <!-- roles asignados al usuario -->
-                <td>@u.RolesNombres</td>
-
-                <!-- muestra el estado actual del usuario -->
-                <td>
-
-                    @if (u.Estado == "Activo")
-                    {
-                        <span class="badge bg-success">Activo</span>
-                    }
-                    else if (u.Estado == "Inactivo")
-                    {
-                        <span class="badge bg-secondary">Inactivo</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-danger">Bloqueado</span>
-                    }
-
-                </td>
-
-                <!-- botones para editar, activar, inactivar o eliminar -->
-                <td>
-
-                    <!-- boton para editar informacion -->
-                    <a asp-page="Editar"
-                       asp-route-id="@u.IdUsuario"
-                       class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-
-                    <!-- formulario para cambiar el estado -->
-                    <form method="post"
-                          asp-page-handler="CambiarEstado"
-                          class="d-inline">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="id"
-                               value="@u.IdUsuario" />
-
-                        @if (u.Estado == "Activo")
-                        {
-                            <input type="hidden"
-                                   name="nuevoEstado"
-                                   value="Inactivo" />
-
-                            <button type="submit"
-                                    class="btn btn-secondary btn-sm">
-                                Inactivar
-                            </button>
-                        }
-                        else
-                        {
-                            <input type="hidden"
-                                   name="nuevoEstado"
-                                   value="Activo" />
-
-                            <button type="submit"
-                                    class="btn btn-primary btn-sm">
-                                Activar
-                            </button>
-                        }
-
-                    </form>
-
-                    <!-- formulario para eliminar un usuario -->
-                    <form method="post"
-                          asp-page-handler="Eliminar"
-                          class="d-inline"
-                          onsubmit="return confirm('¿Está seguro de eliminar este usuario?');">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="id"
-                               value="@u.IdUsuario" />
-
-                        <button type="submit"
-                                class="btn btn-danger btn-sm">
-                            Eliminar
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
+            if (Model.Usuario.RolesSeleccionados.Contains(rol.id_rol))
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" checked
+                           name="Usuario.RolesSeleccionados"
+                           value="@rol.id_rol"
+                           id="rol_@rol.id_rol" />
+                    <label class="form-check-label" for="rol_@rol.id_rol">
+                        @rol.nombre_rol
+                    </label>
+                </div>
+            }
+            else
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           name="Usuario.RolesSeleccionados"
+                           value="@rol.id_rol"
+                           id="rol_@rol.id_rol" />
+                    <label class="form-check-label" for="rol_@rol.id_rol">
+                        @rol.nombre_rol
+                    </label>
+                </div>
+            }
         }
+        <span asp-validation-for="Usuario.RolesSeleccionados" class="text-danger"></span>
+    </div>
 
-    </tbody>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <div>@error.ErrorMessage</div>
+            }
+        </div>
+    }
 
-</table>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/Usuarios" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -32,7 +32,7 @@ namespace AdminPersonal.Pages.Concursos
             await _bitacoraService.RegistrarAsync(idUsuario,
                 $"Eliminar Concurso: {JsonSerializer.Serialize(concurso)}");
 
-            TempData["Mensaje"] = "Concurso eliminado exitosamente.";
+            TempData["Exito"] = "Concurso eliminado exitosamente.";
             return RedirectToPage("Index");
         }
     }

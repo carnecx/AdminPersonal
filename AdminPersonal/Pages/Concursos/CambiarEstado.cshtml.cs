@@ -28,7 +28,7 @@ namespace AdminPersonal.Pages.Concursos
             await _bitacoraService.RegistrarAsync(idUsuario,
                 $"Cambiar estado Concurso id={id} a '{concurso.Estado}'");
 
-            TempData["Mensaje"] = $"El concurso fue marcado como {concurso.Estado}.";
+            TempData["Exito"] = $"El concurso fue marcado como {concurso.Estado}.";
             return RedirectToPage("Index");
         }
     }

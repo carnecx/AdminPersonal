@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+ï»¿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySqlConnector;
 using System.Collections.Generic;
@@ -62,7 +62,7 @@ namespace AdminPersonal.Pages.Areas
             using var con = new MySqlConnection(conn);
             con.Open();
 
-            if (!Regex.IsMatch(Nombre, @"^[A-Za-záéíóúÁÉÍÓÚñÑ ]+$"))
+            if (!Regex.IsMatch(Nombre, @"^[A-Za-zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ]+$"))
             {
                 MensajeError = "El nombre solo debe contener letras y espacios.";
                 this.IdArea = IdArea;
@@ -103,11 +103,11 @@ namespace AdminPersonal.Pages.Areas
                 string sqlBit = "INSERT INTO bitacora (id_usuario, descripcion) VALUES (@u, @d)";
                 using var cmdBit = new MySqlCommand(sqlBit, con);
                 cmdBit.Parameters.AddWithValue("@u", idUsuario);
-                cmdBit.Parameters.AddWithValue("@d", $"Actualización de Área - Anterior: {anterior} | Nuevo: {nuevo}");
+                cmdBit.Parameters.AddWithValue("@d", $"Actualizaciï¿½n de ï¿½rea - Anterior: {anterior} | Nuevo: {nuevo}");
                 cmdBit.ExecuteNonQuery();
             }
 
-            TempData["MensajeExito"] = "Área actualizada correctamente.";
+            TempData["Exito"] = "Area actualizada correctamente.";
             return RedirectToPage("/Areas/Index");
         }
     }
