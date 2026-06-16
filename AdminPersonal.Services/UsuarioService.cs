@@ -1,80 +1,155 @@
 ﻿using AdminPersonal.Entities;
 using AdminPersonal.Repository;
 using AdminPersonal.Services.Abstract;
+using System.Text.RegularExpressions;
 
 namespace AdminPersonal.Services
 {
-    // servicio encargado de manejar la logica de negocio relacionada con usuarios
     public class UsuarioService : IUsuarioService
     {
-        // referencia al repositorio de usuarios
         private readonly IUsuarioRepository _repo;
-
-        // servicio encargado de la validacion y manejo de contraseñas
         private readonly PasswordService _passwordService;
 
-        // constructor que recibe las dependencias mediante inyeccion
         public UsuarioService(IUsuarioRepository repo, PasswordService passwordService)
         {
             _repo = repo;
             _passwordService = passwordService;
         }
 
-        // metodos del Login
-
-        // busca un usuario por nombre de usuario
         public async Task<Usuario?> BuscarPorUsuarioAsync(string nombreUsuario)
-            => await _repo.BuscarPorUsuarioAsync(nombreUsuario);
+        {
+            if (string.IsNullOrWhiteSpace(nombreUsuario))
+                return null;
 
-        // valida que la contraseña digitada coincida con la almacenada
+            return await _repo.BuscarPorUsuarioAsync(nombreUsuario);
+        }
+
         public bool ValidarPassword(string contrasenaDigitada, string contrasenaBD)
-            => _passwordService.Verify(contrasenaDigitada, contrasenaBD);
+        {
+            if (string.IsNullOrWhiteSpace(contrasenaDigitada))
+                return false;
 
-        // registra un intento fallido de inicio de sesion
+            if (string.IsNullOrWhiteSpace(contrasenaBD))
+                return false;
+
+            return _passwordService.Verify(contrasenaDigitada, contrasenaBD);
+        }
+
         public async Task RegistrarFalloAsync(Usuario usuario)
-            => await _repo.RegistrarFalloAsync(usuario);
+        {
+            if (usuario == null)
+                throw new Exception("El usuario es requerido.");
 
-        // reinicia el contador de intentos fallidos despues de un login exitoso
+            await _repo.RegistrarFalloAsync(usuario);
+        }
+
         public async Task ReiniciarIntentosAsync(int idUsuario)
-            => await _repo.ReiniciarIntentosAsync(idUsuario);
+        {
+            if (idUsuario <= 0)
+                throw new Exception("El id del usuario no es valido.");
 
-        // obtiene el nombre del rol asociado al usuario
+            await _repo.ReiniciarIntentosAsync(idUsuario);
+        }
+
         public async Task<string?> ObtenerRolAsync(int idUsuario)
-            => await _repo.ObtenerRolAsync(idUsuario);
+        {
+            if (idUsuario <= 0)
+                return null;
 
-        // obtiene el identificador del rol asociado al usuario
+            return await _repo.ObtenerRolAsync(idUsuario);
+        }
+
         public async Task<int?> ObtenerIdRolAsync(int idUsuario)
-            => await _repo.ObtenerIdRolAsync(idUsuario);
+        {
+            if (idUsuario <= 0)
+                return null;
 
-        // metodos de mantenimiento de usuarios 
+            return await _repo.ObtenerIdRolAsync(idUsuario);
+        }
 
-        // obtiene todos los usuarios registrados
         public Task<IEnumerable<Usuario>> ObtenerTodosAsync()
-            => _repo.ObtenerTodosAsync();
+        {
+            return _repo.ObtenerTodosAsync();
+        }
 
-        // obtiene un usuario especifico por id
-        public Task<Usuario?> ObtenerPorIdAsync(int id)
-            => _repo.ObtenerPorIdAsync(id);
+        public async Task<Usuario?> ObtenerPorIdAsync(int id)
+        {
+            if (id <= 0)
+                throw new Exception("El id del usuario no es valido.");
 
-        // crea un nuevo usuario
-        public Task<int> CrearAsync(Usuario u, int idUsuarioSesion)
-            => _repo.CrearAsync(u, idUsuarioSesion);
+            return await _repo.ObtenerPorIdAsync(id);
+        }
 
-        // actualiza la informacion de un usuario
-        public Task ActualizarAsync(Usuario u, int idUsuarioSesion)
-            => _repo.ActualizarAsync(u, idUsuarioSesion);
+        public async Task<int> CrearAsync(Usuario u, int idUsuarioSesion)
+        {
+            ValidarUsuario(u, esCreacion: true);
 
-        // elimina un usuario si no posee datos relacionados
-        public Task<(bool ok, string mensaje)> EliminarAsync(int id, int idUsuarioSesion)
-            => _repo.EliminarAsync(id, idUsuarioSesion);
+            return await _repo.CrearAsync(u, idUsuarioSesion);
+        }
 
-        // cambia el estado del usuario
-        // activo, inactivo o bloqueado
-        public Task CambiarEstadoAsync(int id, string nuevoEstado, int idUsuarioSesion)
-            => _repo.CambiarEstadoAsync(id, nuevoEstado, idUsuarioSesion);
+        public async Task ActualizarAsync(Usuario u, int idUsuarioSesion)
+        {
+            if (u.IdUsuario <= 0)
+                throw new Exception("El id del usuario no es valido.");
 
-        // obtiene la lista de roles disponibles
+            ValidarUsuario(u, esCreacion: false);
+
+            await _repo.ActualizarAsync(u, idUsuarioSesion);
+        }
+
+        public async Task<(bool ok, string mensaje)> EliminarAsync(int id, int idUsuarioSesion)
+        {
+            if (id <= 0)
+                return (false, "El id del usuario no es valido.");
+
+            return await _repo.EliminarAsync(id, idUsuarioSesion);
+        }
+
+        public async Task CambiarEstadoAsync(int id, string nuevoEstado, int idUsuarioSesion)
+        {
+            if (id <= 0)
+                throw new Exception("El id del usuario no es valido.");
+
+            if (nuevoEstado != "Activo" &&
+                nuevoEstado != "Inactivo" &&
+                nuevoEstado != "Bloqueado")
+                throw new Exception("El estado indicado no es valido.");
+
+            await _repo.CambiarEstadoAsync(id, nuevoEstado, idUsuarioSesion);
+        }
+
         public Task<IEnumerable<Rol>> ObtenerRolesAsync()
-            => _repo.ObtenerRolesAsync();
+        {
+            return _repo.ObtenerRolesAsync();
+        }
+
+        private void ValidarUsuario(Usuario u, bool esCreacion)
+        {
+            if (u == null)
+                throw new Exception("Los datos del usuario son requeridos.");
+
+            if (string.IsNullOrWhiteSpace(u.NombreUsuario))
+                throw new Exception("El nombre de usuario es requerido.");
+
+            if (string.IsNullOrWhiteSpace(u.NombreCompleto))
+                throw new Exception("El nombre completo es requerido.");
+
+            if (string.IsNullOrWhiteSpace(u.Correo))
+                throw new Exception("El correo es requerido.");
+
+            if (!Regex.IsMatch(u.Correo, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                throw new Exception("El correo no tiene un formato valido.");
+
+            if (esCreacion && string.IsNullOrWhiteSpace(u.Contrasena))
+                throw new Exception("La contrasena es requerida.");
+
+            if (u.RolesSeleccionados == null || !u.RolesSeleccionados.Any())
+                throw new Exception("Debe seleccionar al menos un rol.");
+
+            if (u.Estado != "Activo" &&
+                u.Estado != "Inactivo" &&
+                u.Estado != "Bloqueado")
+                throw new Exception("El estado del usuario no es valido.");
+        }
     }
 }

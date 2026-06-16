@@ -39,21 +39,7 @@ namespace AdminPersonal.Pages.Usuarios
         // se ejecuta cuando el usuario presiona guardar
         public async Task<IActionResult> OnPostAsync()
         {
-            // valida que la contraseña no venga vacia
-            if (string.IsNullOrWhiteSpace(Usuario.Contrasena))
-                ModelState.AddModelError(
-                    "Usuario.Contrasena",
-                    "La contraseña es requerida.");
-
-            // valida que se haya seleccionado al menos un rol
-            if (Usuario.RolesSeleccionados == null ||
-                !Usuario.RolesSeleccionados.Any())
-
-                ModelState.AddModelError(
-                    "",
-                    "Debe seleccionar al menos un rol.");
-
-            // si existen errores de validacion
+            // valida las reglas del modelo
             if (!ModelState.IsValid)
             {
                 // vuelve a cargar la lista de roles
@@ -66,6 +52,7 @@ namespace AdminPersonal.Pages.Usuarios
             try
             {
                 // llama al servicio para crear el usuario
+                // las reglas de negocio se validan en UsuarioService
                 await _service.CrearAsync(
                     Usuario,
                     IdSesion);
@@ -79,7 +66,7 @@ namespace AdminPersonal.Pages.Usuarios
             }
             catch (Exception ex)
             {
-                // muestra el error ocurrido
+                // muestra el error enviado por el servicio
                 ModelState.AddModelError(
                     "",
                     "Error al crear usuario: " + ex.Message);

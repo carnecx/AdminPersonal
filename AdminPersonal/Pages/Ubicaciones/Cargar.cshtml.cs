@@ -55,27 +55,30 @@ namespace AdminPersonal.Pages.Ubicaciones
                 return RedirectToPage("/Account/Login",
                     new { mensaje = "Por favor inicie sesión para utilizar el sistema" });
 
-            // valida que el usuario haya seleccionado un archivo
-            if (Datos.Archivo == null || Datos.Archivo.Length == 0)
+            try
             {
-                Error = "Debe seleccionar un archivo.";
-                return Page();
+                // envia el archivo al servicio
+                // las validaciones del archivo se realizan en UbicacionService
+                int contador = await _ubicacionService.CargarCsvAsync(
+                    Datos.Archivo!.OpenReadStream(),
+                    Datos.Archivo.FileName);
+
+                // obtiene el usuario que realiza la accion
+                int idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 1;
+
+                // registra la accion en la bitacora del sistema
+                await _bitacoraService.RegistrarAsync(
+                    idUsuario,
+                    "El usuario realizo la carga de informacion de ubicacion");
+
+                // muestra la cantidad de registros procesados
+                Mensaje = $"Carga realizada correctamente. Registros procesados: {contador}";
             }
-
-            // llama al servicio para procesar el archivo csv
-            int contador = await _ubicacionService.CargarCsvAsync(
-                Datos.Archivo.OpenReadStream());
-
-            // obtiene el usuario que realiza la accion
-            int idUsuario = HttpContext.Session.GetInt32("IdUsuario") ?? 1;
-
-            // registra la accion en la bitacora del sistema
-            await _bitacoraService.RegistrarAsync(
-                idUsuario,
-                "El usuario realizo la carga de informacion de ubicacion");
-
-            // muestra la cantidad de registros procesados
-            Mensaje = $"Carga realizada correctamente. Registros procesados: {contador}";
+            catch (Exception ex)
+            {
+                // muestra el error enviado por el servicio
+                Error = ex.Message;
+            }
 
             // retorna nuevamente la pagina
             return Page();

@@ -2,22 +2,27 @@ using AdminPersonal.Repository;
 
 namespace AdminPersonal.Services
 {
-    // servicio encargado de la logica relacionada con la carga de ubicaciones
     public class UbicacionService
     {
-        // referencia al repositorio que accede a la base de datos
         private readonly UbicacionRepository _repositorio;
 
-        // constructor que recibe el repositorio mediante inyeccion de dependencias
         public UbicacionService(UbicacionRepository repositorio)
         {
             _repositorio = repositorio;
         }
 
-        // procesa un archivo csv con provincias, cantones y distritos
-        public async Task<int> CargarCsvAsync(Stream archivo)
+        public async Task<int> CargarCsvAsync(Stream archivo, string? nombreArchivo = null)
         {
-            // delega el procesamiento al repositorio
+            if (archivo == null)
+                throw new Exception("Debe seleccionar un archivo.");
+
+            if (archivo.Length == 0)
+                throw new Exception("El archivo seleccionado esta vacio.");
+
+            if (!string.IsNullOrWhiteSpace(nombreArchivo) &&
+                !nombreArchivo.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+                throw new Exception("El archivo debe tener formato csv.");
+
             return await _repositorio.CargarCsvAsync(archivo);
         }
     }
