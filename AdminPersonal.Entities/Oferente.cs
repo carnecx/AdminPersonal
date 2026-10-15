@@ -11,4 +11,10 @@
         public List<string> Telefonos { get; set; } = new();
         public List<int> ConcursosIds { get; set; } = new();
     }
+
+
+
+    shbhbdhbhbdhsbbsbs
 }
+
+
