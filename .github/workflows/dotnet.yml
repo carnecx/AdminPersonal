@@ -1,0 +1,26 @@
+name: CI .NET
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restaurar dependencias
+        run: dotnet restore AdminPersonal.sln
+
+      - name: Compilar solución
+        run: dotnet build AdminPersonal.sln --configuration Release --no-restore
